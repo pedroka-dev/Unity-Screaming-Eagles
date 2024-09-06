@@ -39,7 +39,6 @@ public class PlayerMovement : MonoBehaviour
         //Coyote time allows player to jump a brief moment after being on air
         if (IsGrounded())
         {
-            Debug.Log("GROUNDED!!");
             coyoteTimeCounter = coyoteTime;
         }
         else
