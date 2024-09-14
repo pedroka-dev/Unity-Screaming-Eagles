@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ExplosionController : MonoBehaviour
+public class ExplosionDestroySelf : MonoBehaviour
 {
     //This script only makes the explosion destroy itself
     //All explosion behaviour is on character controller
@@ -15,5 +15,10 @@ public class ExplosionController : MonoBehaviour
     {
         yield return new WaitForSeconds(delaySeconds);
         Destroy(gameObject);
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+      
     }
 }

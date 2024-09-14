@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor.Tilemaps;
 using UnityEngine;
 
@@ -9,7 +10,10 @@ public class PlayerMovement : MonoBehaviour
     Rigidbody2D rb;
 
     //Movement
-    [SerializeField] private float speed = 8f;
+    [SerializeField] private float movementSpeed = 8f;
+    [SerializeField] private float noInputDrag = 1f;
+    //[SerializeField] private float baseAirStraffingSpeed = 1f;
+    //[SerializeField] private float maxAirStraffingSpeed = 4f;
     private float horizontalInput;
     private bool isFacingRight = true;
 
@@ -45,7 +49,28 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        rb.velocity = new Vector2(horizontalInput * speed, rb.velocity.y);      //Gives player horizontal speed if trying to walk
+        var currentVelocity = rb.velocity.x;
+        //Adds attrition if is on the ground with no input
+        if (IsGrounded() && horizontalInput == 0) //|| (currentVelocity < -movementSpeed && currentVelocity > movementSpeed)))
+        {
+            rb.drag = noInputDrag;
+        }
+        else
+        {
+            rb.drag = 0f;
+            float expectedMovementSpeed = horizontalInput * movementSpeed;
+            if (!IsGrounded())      
+            {
+                expectedMovementSpeed /= 2; //less air control while of the ground
+            }
+
+            if ((horizontalInput != -1 && currentVelocity < expectedMovementSpeed) || (horizontalInput != 1 && currentVelocity > expectedMovementSpeed))
+            {
+                //todo: fix top speed
+                rb.velocity += new Vector2(expectedMovementSpeed, 0);
+            }
+        }
+        Debug.Log(rb.velocity.x);
     }
 
     private void HandlePlayerMovement()
@@ -81,7 +106,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (coyoteTimeCounter > 0f && jumpBufferCounter > 0f && !isJumping)
         {
-            rb.velocity = new Vector2(rb.velocity.x, jumpingPower);
+            rb.velocity = new Vector2(rb.velocity.x, jumpingPower);     //todo: fix not being compatible with rocket jump
 
             jumpBufferCounter = 0f;
 
@@ -90,7 +115,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetButtonUp("Jump") && rb.velocity.y > 0f)
         {
-            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
+            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f); //todo: fix not being compatible with rocket jump
 
             coyoteTimeCounter = 0f;
         }
@@ -99,10 +124,9 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandlePlayerAim()
     {
-        Vector3 mousePosition = PlayerCamera.ScreenToWorldPoint(Input.mousePosition);
-        float angle = Vector2.Angle(mousePosition, rb.position);
+        Vector2 mousePosition = PlayerCamera.ScreenToWorldPoint(Input.mousePosition);
+        //float angle = Vector2.Angle(mousePosition, rb.position);
         Debug.DrawLine(rb.position, mousePosition, Color.yellow, 0.001f);
-        mousePosition.z = 0;
         if (Input.GetMouseButtonDown(0))
         {
             Instantiate(spawnedExplosionFoo, mousePosition, new Quaternion());
