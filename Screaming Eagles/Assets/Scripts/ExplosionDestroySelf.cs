@@ -8,7 +8,7 @@ public class ExplosionDestroySelf : MonoBehaviour
     //All explosion behaviour is on character controller
     void Update()
     {
-        StartCoroutine(DestroySelf(1f));
+        StartCoroutine(DestroySelf(0.1f));
     }
 
     private IEnumerator DestroySelf(float delaySeconds )

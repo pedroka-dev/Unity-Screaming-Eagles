@@ -11,9 +11,7 @@ public class PlayerMovement : MonoBehaviour
 
     //Movement
     [SerializeField] private float movementSpeed = 8f;
-    [SerializeField] private float noInputDrag = 1f;
-    //[SerializeField] private float baseAirStraffingSpeed = 1f;
-    //[SerializeField] private float maxAirStraffingSpeed = 4f;
+    [SerializeField] private float groundDrag = 1f;
     private float horizontalInput;
     private bool isFacingRight = true;
 
@@ -32,6 +30,11 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Camera PlayerCamera;
     [SerializeField] private GameObject spawnedExplosionFoo;
 
+    //Rocket Junp 
+    [SerializeField] private float explosionKnockback = 20f;
+    [SerializeField] private float airControlFactor = 0.5f;
+    [SerializeField] private float rocketJumpBonusFactor = 1.5f;
+
 
     private bool IsGrounded() => Physics2D.OverlapCircle(groundCheck.position, 0.25f, groundLayer);
 
@@ -42,38 +45,26 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        HandlePlayerMovement();
+        HandlePlayerMovementInput();
         HandlePlayerJump();
         HandlePlayerAim();
     }
 
     private void FixedUpdate()
     {
-        var currentVelocity = rb.velocity.x;
-        //Adds attrition if is on the ground with no input
-        if (IsGrounded() && horizontalInput == 0) //|| (currentVelocity < -movementSpeed && currentVelocity > movementSpeed)))
-        {
-            rb.drag = noInputDrag;
-        }
-        else
-        {
-            rb.drag = 0f;
-            float expectedMovementSpeed = horizontalInput * movementSpeed;
-            if (!IsGrounded())      
-            {
-                expectedMovementSpeed /= 2; //less air control while of the ground
-            }
-
-            if ((horizontalInput != -1 && currentVelocity < expectedMovementSpeed) || (horizontalInput != 1 && currentVelocity > expectedMovementSpeed))
-            {
-                //todo: fix top speed
-                rb.velocity += new Vector2(expectedMovementSpeed, 0);
-            }
-        }
+        HandlePlayerMovementPhysics();
         Debug.Log(rb.velocity.x);
     }
 
-    private void HandlePlayerMovement()
+    private void OnTriggerEnter2D(Collider2D collider)
+    {
+        if (collider.gameObject.layer == LayerMask.NameToLayer("Explosion"))
+        {
+            HandleReceiveExplosion(collider.transform.position);
+        }
+    }
+
+    private void HandlePlayerMovementInput()
     {
         //if(allowMovement)  
         horizontalInput = Input.GetAxisRaw("Horizontal");   //This gets absolute values like -1, 0 or 1, with no gradual increase like Input.GetAxis
@@ -81,10 +72,44 @@ public class PlayerMovement : MonoBehaviour
         //}
     }
 
+    private void HandlePlayerMovementPhysics()
+    {
+        var currentVelocity = rb.velocity.x;
+        float targetVelocity = horizontalInput * movementSpeed;
+
+        if (IsGrounded() && (horizontalInput == 0 || Math.Abs(currentVelocity) > movementSpeed))
+        {
+            // Apply drag to slow the player when there's no input or the velocity exceeds max speed
+            rb.drag = groundDrag;
+        }
+        else
+        {
+            // Reset drag when moving or in air
+            rb.drag = 0;
+
+            if (!IsGrounded())
+            {
+                targetVelocity *= airControlFactor; // For reducing air control
+            }
+
+            if (horizontalInput != 0)
+            {
+                // Calculate the force needed to achieve the target velocity
+                float velocityChange = targetVelocity - currentVelocity;
+                float force = velocityChange * rb.mass / Time.fixedDeltaTime;
+
+                // Apply force but cap it to prevent going over the movementSpeed
+                if (Math.Abs(currentVelocity) < movementSpeed || Math.Sign(targetVelocity) != Math.Sign(currentVelocity))
+                {
+                    rb.AddForce(new Vector2(force, 0));
+                }
+            }
+        }
+    }
+
     private void HandlePlayerJump()
     {
-        //if(allowMovement)  
-        //Coyote time allows player to jump a brief moment after being on air
+        // Coyote time allows player to jump a brief moment after being in the air
         if (IsGrounded())
         {
             coyoteTimeCounter = coyoteTime;
@@ -94,7 +119,7 @@ public class PlayerMovement : MonoBehaviour
             coyoteTimeCounter -= Time.deltaTime;
         }
 
-        //Jump buffer allows player to jump for a brief moment before touching the ground
+        // Jump buffer allows player to jump for a brief moment before touching the ground
         if (Input.GetButtonDown("Jump"))
         {
             jumpBufferCounter = jumpBufferTime;
@@ -104,22 +129,23 @@ public class PlayerMovement : MonoBehaviour
             jumpBufferCounter -= Time.deltaTime;
         }
 
+        // Check if the player can jump (coyote time and jump buffer)
         if (coyoteTimeCounter > 0f && jumpBufferCounter > 0f && !isJumping)
         {
-            rb.velocity = new Vector2(rb.velocity.x, jumpingPower);     //todo: fix not being compatible with rocket jump
+            //rb.drag = 0;
+            rb.AddForce(new Vector2(0f, jumpingPower), ForceMode2D.Impulse); // Using AddForce for jumping
 
             jumpBufferCounter = 0f;
 
             StartCoroutine(JumpCooldown());
         }
 
+        // Allow for a "variable jump height" by reducing upward velocity when the player releases the jump button
         if (Input.GetButtonUp("Jump") && rb.velocity.y > 0f)
         {
-            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f); //todo: fix not being compatible with rocket jump
-
+            rb.AddForce(new Vector2(0f, -rb.velocity.y * 0.5f), ForceMode2D.Impulse); // Smooth deceleration when releasing the jump
             coyoteTimeCounter = 0f;
         }
-        //}
     }
 
     private void HandlePlayerAim()
@@ -152,5 +178,19 @@ public class PlayerMovement : MonoBehaviour
             localScale.x *= -1f;
             transform.localScale = localScale;
         }
+    }
+
+    private void HandleReceiveExplosion(Vector2 explosionCenter)
+    {
+        Vector2 direction = rb.position - explosionCenter;
+        direction.Normalize();  // Normalize the direction vector to get only the direction, ignoring magnitude
+        Vector2 knockbackForce = direction * explosionKnockback;
+        if (!IsGrounded())
+        {
+            knockbackForce *= rocketJumpBonusFactor; //adds bonus knockback if already in air
+        }
+
+        // Apply the force to the Rigidbody
+        rb.AddForce(knockbackForce, ForceMode2D.Impulse);
     }
 }
