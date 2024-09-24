@@ -5,7 +5,7 @@ using UnityEngine;
 public class ExplosionDestroySelf : MonoBehaviour
 {
     //This script only makes the explosion destroy itself
-    //All explosion behaviour is on character controller
+    //All explosion behaviour is on player controller
     void Update()
     {
         StartCoroutine(DestroySelf(0.1f));
@@ -15,10 +15,5 @@ public class ExplosionDestroySelf : MonoBehaviour
     {
         yield return new WaitForSeconds(delaySeconds);
         Destroy(gameObject);
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-      
     }
 }

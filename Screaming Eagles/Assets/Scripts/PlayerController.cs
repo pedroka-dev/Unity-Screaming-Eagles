@@ -28,7 +28,7 @@ public class PlayerMovement : MonoBehaviour
 
     //Aiming
     [SerializeField] private Camera PlayerCamera;
-    [SerializeField] private GameObject spawnedExplosionFoo;
+    [SerializeField] private GameObject spawnedRocket;
 
     //Rocket Junp 
     [SerializeField] private float explosionKnockback = 20f;
@@ -53,14 +53,13 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         HandlePlayerMovementPhysics();
-        Debug.Log(rb.velocity.x);
     }
 
-    private void OnTriggerEnter2D(Collider2D collider)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collider.gameObject.layer == LayerMask.NameToLayer("Explosion"))
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Explosion"))
         {
-            HandleReceiveExplosion(collider.transform.position);
+            HandleReceiveExplosion(collision.transform.position);
         }
     }
 
@@ -87,7 +86,7 @@ public class PlayerMovement : MonoBehaviour
             // Reset drag when moving or in air
             rb.drag = 0;
 
-            if (!IsGrounded())
+            if (!IsGrounded())      //todo: fix trying to change direction on air
             {
                 targetVelocity *= airControlFactor; // For reducing air control
             }
@@ -151,14 +150,18 @@ public class PlayerMovement : MonoBehaviour
     private void HandlePlayerAim()
     {
         Vector2 mousePosition = PlayerCamera.ScreenToWorldPoint(Input.mousePosition);
-        //float angle = Vector2.Angle(mousePosition, rb.position);
-        Debug.DrawLine(rb.position, mousePosition, Color.yellow, 0.001f);
-        if (Input.GetMouseButtonDown(0))
+        if(Input.GetMouseButtonDown(0))
         {
-            Instantiate(spawnedExplosionFoo, mousePosition, new Quaternion());
+            //if(ItemEquiped == RocketJumper) {
+            ShootRocket(mousePosition);
         }
     }
 
+    private void ShootRocket(Vector2 mousePosition)
+    {
+        float angle = Vector2.SignedAngle(Vector2.right, rb.position - mousePosition);
+        Instantiate(spawnedRocket, rb.position, Quaternion.Euler(0, 0, angle + 90));
+    }
 
     private IEnumerator JumpCooldown()
     {
@@ -167,7 +170,6 @@ public class PlayerMovement : MonoBehaviour
         isJumping = false;
     }
     
-
 
     private void FlipCharacter()
     {
