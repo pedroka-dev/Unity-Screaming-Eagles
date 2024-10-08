@@ -17,16 +17,18 @@ public class RocketController : MonoBehaviour
     void ApplyVelocity()    //Gives constant velocity based on the initial rocket rotation angle at Z axis
     {
         float radians = (rb.transform.eulerAngles.z + 90) * Mathf.Deg2Rad;
-        Vector2 velocity = new Vector2(Mathf.Cos(radians), Mathf.Sin(radians)) * projectileSpeed;   
+        Vector2 velocity = new Vector2(Mathf.Cos(radians), Mathf.Sin(radians)) * projectileSpeed;
         rb.velocity = velocity;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(collision.gameObject.layer == LayerMask.NameToLayer("Ground"))       //todo: collision with mercs
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Ground"))       //todo: collision with mercs
         {
-            Instantiate(spawnedExplosion, rb.position, new Quaternion());
-            Destroy(gameObject); 
+            Quaternion randomZRotation = Quaternion.Euler(0, 0, Random.Range(0f, 360f));
+
+            Instantiate(spawnedExplosion, rb.position, randomZRotation);
+            Destroy(gameObject);
         }
     }
 }
