@@ -1,11 +1,8 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEditor.Tilemaps;
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
     Rigidbody2D rb;
 
@@ -35,12 +32,16 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float airControlFactor = 0.5f;
     [SerializeField] private float rocketJumpBonusFactor = 1.5f;
 
+    //Attacking
+    [SerializeField] private AudioClip shootingRocketAudioClip;
 
     private bool IsGrounded() => Physics2D.OverlapCircle(groundCheck.position, 0.25f, groundLayer);
+    private AudioSource audioSource;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void Update()
@@ -159,6 +160,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void ShootRocket(Vector2 mousePosition)
     {
+        audioSource.PlayOneShot(shootingRocketAudioClip);
         float angle = Vector2.SignedAngle(Vector2.right, rb.position - mousePosition);
         Instantiate(spawnedRocket, rb.position, Quaternion.Euler(0, 0, angle + 90));
     }

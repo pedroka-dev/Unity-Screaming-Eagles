@@ -3,8 +3,7 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags:
-  - Explosion
+  tags: []
   layers:
   - Default
   - TransparentFX
@@ -39,7 +38,10 @@ TagManager:
   - 
   - 
   m_SortingLayers:
-  - name: Player
+  - name: Projectile
+    uniqueID: 561629065
+    locked: 0
+  - name: Character
     uniqueID: 3970809795
     locked: 0
   - name: Default
