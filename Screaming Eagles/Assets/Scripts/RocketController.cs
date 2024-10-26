@@ -16,7 +16,7 @@ public class RocketController : MonoBehaviour
 
     void ApplyVelocity()    //Gives constant velocity based on the initial rocket rotation angle at Z axis
     {
-        float radians = (rb.transform.eulerAngles.z + 90) * Mathf.Deg2Rad;
+        float radians = (rb.transform.eulerAngles.z) * Mathf.Deg2Rad;
         Vector2 velocity = new Vector2(Mathf.Cos(radians), Mathf.Sin(radians)) * projectileSpeed;
         rb.velocity = velocity;
     }

@@ -110,64 +110,64 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: projectile_rocket
+      name: explosive projectiles_0
       rect:
         serializedVersion: 2
         x: 1
-        y: 1
-        width: 22
-        height: 88
+        y: 44
+        width: 88
+        height: 22
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f79e01a17ea01964791255d27395a96e
-      internalID: -1820592192
+      spriteID: 2f4fd109bf973584e86c06b6f051271e
+      internalID: -1779404840
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: projectile_sticky
+      name: explosive projectiles_1
       rect:
         serializedVersion: 2
-        x: 27
-        y: 53
-        width: 38
-        height: 37
+        x: 1
+        y: 8
+        width: 48
+        height: 26
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d4b01d3d217c68e49af684fd5ed84fdd
-      internalID: 1052130299
+      spriteID: 2b0f6912cd3ce7648bb71342f7f27ab3
+      internalID: 1570666577
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: projectile_pipe
+      name: explosive projectiles_2
       rect:
         serializedVersion: 2
-        x: 33
-        y: 1
-        width: 26
-        height: 48
+        x: 53
+        y: 2
+        width: 37
+        height: 38
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1d24c305f21354148bccfd5e08a1c364
-      internalID: -879328502
+      spriteID: b8d7a7f58ad7f994fa85e3b020060eaf
+      internalID: -472235578
       vertices: []
       indices: 
       edges: []
@@ -183,9 +183,9 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      projectile_pipe: -879328502
-      projectile_rocket: -1820592192
-      projectile_sticky: 1052130299
+      explosive projectiles_0: -1779404840
+      explosive projectiles_1: 1570666577
+      explosive projectiles_2: -472235578
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

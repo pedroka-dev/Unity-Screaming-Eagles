@@ -1,8 +1,5 @@
 using System;
 using System.Collections;
-using System.Threading;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
 using UnityEngine;
 
 enum SelectedWeapon
@@ -21,7 +18,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float groundedDrag = 1f;
     [SerializeField] private float airControlFactor = 0.5f;
     private float horizontalInput;
-    private bool isFacingRight = true;
 
     [Header("Jumping")]
     [SerializeField] private float jumpingPower = 16f;
@@ -29,6 +25,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask groundLayer;
 
     private bool isJumping;
+    private bool isRocketJumping;
     private float coyoteTime = 0.2f;
     private float coyoteTimeCounter;
     private float jumpBufferTime = 0.2f;
@@ -36,8 +33,11 @@ public class PlayerController : MonoBehaviour
 
     [Header("Aiming & Loadout")]
     [SerializeField] private Camera PlayerCamera;
+    [SerializeField] private AudioClip drawPrimary;
+    [SerializeField] private AudioClip drawMelee;
 
-    private bool canShoot = true;
+    private float aimAngle = 360f;  //scale of 0 to 360 always, counter clockwise
+    private bool isFacingRight = true;
     private SelectedWeapon currentSelectedWeapon = SelectedWeapon.Primary;
 
     [Header("Primary Weapon")]
@@ -53,6 +53,7 @@ public class PlayerController : MonoBehaviour
     private float primaryReloadSpeed = 0.8f;
     //private float primaryDamage = 0f;
 
+    private bool canShootPrimary = true;
     private bool isReloading = false;
     private int currentPrimaryClipContent = 4;
 
@@ -60,9 +61,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private AudioClip shovelAttackAudio;
     [SerializeField] private AudioClip shovelAttackCritAudio;
 
-    private float meleeFireRateMs = 0.8f;
+    private bool canShootMelee = true;
+    private float meleeFireRate = 0.8f;
     private float meleeDamage = 65f;
-
 
     private bool IsGrounded() => Physics2D.OverlapCircle(groundCheck.position, 0.25f, groundLayer);
     private AudioSource audioSource;
@@ -77,6 +78,7 @@ public class PlayerController : MonoBehaviour
     {
         HandlePlayerMovementInput();
         HandlePlayerJump();
+        HandlePlayerAim();
         HandlePlayerWeapon();
         HandlePlayerLoadout();
     }
@@ -99,7 +101,6 @@ public class PlayerController : MonoBehaviour
     {
         //if(allowMovement)  
         horizontalInput = Input.GetAxisRaw("Horizontal");   //This gets absolute values like -1, 0 or 1, with no gradual increase like Input.GetAxis
-        CharacterFlip();
         //}
     }
 
@@ -190,28 +191,46 @@ public class PlayerController : MonoBehaviour
 
     private void CharacterFlip()
     {
-        if (isFacingRight && horizontalInput < 0f || !isFacingRight && horizontalInput > 0f)
+        if (isFacingRight && (aimAngle > 95 && aimAngle < 265) || !isFacingRight && (aimAngle < 85 || aimAngle > 275))      //Verifiy if player is aiming on the right or left side of the character, with a 10 degrees blindspot
         {
             Vector2 localScale = transform.localScale;
             isFacingRight = !isFacingRight;
             localScale.x *= -1f;
             transform.localScale = localScale;
         }
+
     }
     #endregion
 
+
+    #region Attack
+    private void HandlePlayerAim()
+    {
+        Vector2 mousePosition = PlayerCamera.ScreenToWorldPoint(Input.mousePosition);
+        aimAngle = Vector2.SignedAngle(Vector2.right, rb.position - mousePosition) + 180;       //garants angle between 0 and 360
+        Debug.Log("Angle " + aimAngle);
+        CharacterFlip();
+    }
+
     private void HandlePlayerLoadout()
     {
+        if (IsGrounded())
+            isRocketJumping = false;
+
         if (Input.GetKeyDown(KeyCode.Alpha1) && currentSelectedWeapon != SelectedWeapon.Primary)   //Change to primary if not equiped and '1' is pressed
         {
             isReloading = false;
             currentSelectedWeapon = SelectedWeapon.Primary;
+            audioSource.PlayOneShot(drawPrimary);
+            StartCoroutine(primaryFireCooldown(0.5f));      //Firerate %50 shorter when switching weapons. Feels better when playing
             Debug.Log($"Changed weapon to {currentSelectedWeapon}");
         }
         else if (Input.GetKeyDown(KeyCode.Alpha3) && currentSelectedWeapon != SelectedWeapon.Melee)  //Change to primary if not equiped and '3' is pressed
         {
             isReloading = false;
             currentSelectedWeapon = SelectedWeapon.Melee;
+            audioSource.PlayOneShot(drawMelee);
+            StartCoroutine(meleeFireCooldown(0.5f));    //Firerate %50 shorter when switching weapons. Feels better when playing
             Debug.Log($"Changed weapon to {currentSelectedWeapon}");
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
@@ -229,6 +248,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    //BUG: Sometimes can call this method multiple times, loading at double or even triple speed
     IEnumerator PrimaryReload()
     {
         isReloading = true;
@@ -238,7 +258,7 @@ public class PlayerController : MonoBehaviour
             {
                 yield return new WaitForSeconds(primaryReloadSpeed);
                 if (!isReloading)   //If the nexts reload is cancelled by another action
-                    continue;
+                    break;
                 currentPrimaryClipContent++;
                 audioSource.PlayOneShot(reloadingRocketAudio);
                 Debug.Log("Current Clip Content:" + currentPrimaryClipContent);
@@ -252,29 +272,31 @@ public class PlayerController : MonoBehaviour
 
     private void HandlePlayerWeapon()
     {
-        Vector2 mousePosition = PlayerCamera.ScreenToWorldPoint(Input.mousePosition);
         if (Input.GetMouseButton(0))
         {
             if (currentSelectedWeapon == SelectedWeapon.Primary)
             {
-                ShootRocket(mousePosition);
+                ShootPrimary();
+            }
+            else if(currentSelectedWeapon == SelectedWeapon.Melee)
+            {
+                SwingMelee();
             }
         }
     }
 
-    private void ShootRocket(Vector2 mousePosition)
+    private void ShootPrimary()
     {
-        if (canShoot)
+        if (canShootPrimary)
         {
             if (currentPrimaryClipContent > 0)
             {
 
                 isReloading = false;
                 audioSource.PlayOneShot(shootingRocketAudio);
-                float angle = Vector2.SignedAngle(Vector2.right, rb.position - mousePosition);
-                Instantiate(spawnedRocket, rb.position, Quaternion.Euler(0, 0, angle + 90));
+                Instantiate(spawnedRocket, rb.position, Quaternion.Euler(0, 0, aimAngle));
                 currentPrimaryClipContent--;
-                StartCoroutine(FiringCooldown(primaryFirerate));
+                StartCoroutine(primaryFireCooldown());
                 Debug.Log("Current Clip Content:" + currentPrimaryClipContent);
             }
             else
@@ -288,13 +310,40 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private IEnumerator FiringCooldown(float cooldown)
+    private void SwingMelee()
     {
-        canShoot = false;
-        yield return new WaitForSeconds(cooldown);
-        canShoot = true;
+        if (canShootMelee)
+        {
+            if (isRocketJumping)
+            {
+                audioSource.PlayOneShot(shovelAttackCritAudio);
+            }
+            else
+            {
+                audioSource.PlayOneShot(shovelAttackAudio);
+            }
+
+            Debug.Log("Melee Swing!");
+            StartCoroutine(meleeFireCooldown());
+        }
     }
 
+    private IEnumerator primaryFireCooldown(float weaponSwitchModifier = 1f)
+    {
+        canShootPrimary = false;
+        yield return new WaitForSeconds(primaryFirerate * weaponSwitchModifier);
+        canShootPrimary = true;
+    }
+
+    private IEnumerator meleeFireCooldown(float weaponSwitchModifier = 1f)
+    {
+        canShootMelee = false;
+        yield return new WaitForSeconds(meleeFireRate * weaponSwitchModifier);
+        canShootMelee = true;
+    }
+
+
+    #endregion
 
     private void HandleReceiveExplosion(Vector2 explosionCenter)
     {
@@ -308,5 +357,9 @@ public class PlayerController : MonoBehaviour
 
         // Apply the force to the Rigidbody
         rb.AddForce(knockbackForce, ForceMode2D.Impulse);
+        if (!IsGrounded())
+        {
+            isRocketJumping = true;
+        }
     }
 }
