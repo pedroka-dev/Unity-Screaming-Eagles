@@ -1,39 +1,68 @@
 using System;
 using System.Collections;
+using System.Threading;
+using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
+
+enum SelectedWeapon
+{
+    Primary,
+    Seecondary,
+    Melee
+}
 
 public class PlayerController : MonoBehaviour
 {
     Rigidbody2D rb;
 
-    //Movement
+    [Header("Movement")]
     [SerializeField] private float movementSpeed = 8f;
-    [SerializeField] private float groundDrag = 1f;
+    [SerializeField] private float groundedDrag = 1f;
+    [SerializeField] private float airControlFactor = 0.5f;
     private float horizontalInput;
     private bool isFacingRight = true;
 
-    //Jumping
+    [Header("Jumping")]
     [SerializeField] private float jumpingPower = 16f;
     [SerializeField] private Transform groundCheck;
     [SerializeField] private LayerMask groundLayer;
-    
+
     private bool isJumping;
     private float coyoteTime = 0.2f;
     private float coyoteTimeCounter;
     private float jumpBufferTime = 0.2f;
     private float jumpBufferCounter;
 
-    //Aiming
+    [Header("Aiming & Loadout")]
     [SerializeField] private Camera PlayerCamera;
-    [SerializeField] private GameObject spawnedRocket;
 
-    //Rocket Junp 
-    [SerializeField] private float explosionKnockback = 20f;
-    [SerializeField] private float airControlFactor = 0.5f;
+    private bool canShoot = true;
+    private SelectedWeapon currentSelectedWeapon = SelectedWeapon.Primary;
+
+    [Header("Primary Weapon")]
+    [SerializeField] private float explosionSelfKnockback = 20f;
     [SerializeField] private float rocketJumpBonusFactor = 1.5f;
+    [SerializeField] private GameObject spawnedRocket;
+    [SerializeField] private AudioClip shootingRocketAudio;
+    [SerializeField] private AudioClip reloadingRocketAudio;
+    [SerializeField] private AudioClip clipEmptyAudio;
 
-    //Attacking
-    [SerializeField] private AudioClip shootingRocketAudioClip;
+    private int primaryClipSize = 4;
+    private float primaryFirerate = 0.8f;
+    private float primaryReloadSpeed = 0.8f;
+    //private float primaryDamage = 0f;
+
+    private bool isReloading = false;
+    private int currentPrimaryClipContent = 4;
+
+    [Header("Melee Weapon")]
+    [SerializeField] private AudioClip shovelAttackAudio;
+    [SerializeField] private AudioClip shovelAttackCritAudio;
+
+    private float meleeFireRateMs = 0.8f;
+    private float meleeDamage = 65f;
+
 
     private bool IsGrounded() => Physics2D.OverlapCircle(groundCheck.position, 0.25f, groundLayer);
     private AudioSource audioSource;
@@ -48,7 +77,8 @@ public class PlayerController : MonoBehaviour
     {
         HandlePlayerMovementInput();
         HandlePlayerJump();
-        HandlePlayerAim();
+        HandlePlayerWeapon();
+        HandlePlayerLoadout();
     }
 
     private void FixedUpdate()
@@ -64,11 +94,12 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    #region Movement
     private void HandlePlayerMovementInput()
     {
         //if(allowMovement)  
         horizontalInput = Input.GetAxisRaw("Horizontal");   //This gets absolute values like -1, 0 or 1, with no gradual increase like Input.GetAxis
-        FlipCharacter();
+        CharacterFlip();
         //}
     }
 
@@ -80,7 +111,7 @@ public class PlayerController : MonoBehaviour
         if (IsGrounded() && (horizontalInput == 0 || Math.Abs(currentVelocity) > movementSpeed))
         {
             // Apply drag to slow the player when there's no input or the velocity exceeds max speed
-            rb.drag = groundDrag;
+            rb.drag = groundedDrag;
         }
         else
         {
@@ -148,32 +179,16 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void HandlePlayerAim()
-    {
-        Vector2 mousePosition = PlayerCamera.ScreenToWorldPoint(Input.mousePosition);
-        if(Input.GetMouseButtonDown(0))
-        {
-            //if(ItemEquiped == RocketJumper) {
-            ShootRocket(mousePosition);
-        }
-    }
-
-    private void ShootRocket(Vector2 mousePosition)
-    {
-        audioSource.PlayOneShot(shootingRocketAudioClip);
-        float angle = Vector2.SignedAngle(Vector2.right, rb.position - mousePosition);
-        Instantiate(spawnedRocket, rb.position, Quaternion.Euler(0, 0, angle + 90));
-    }
-
     private IEnumerator JumpCooldown()
     {
         isJumping = true;
         yield return new WaitForSeconds(0.4f);
         isJumping = false;
     }
-    
 
-    private void FlipCharacter()
+
+
+    private void CharacterFlip()
     {
         if (isFacingRight && horizontalInput < 0f || !isFacingRight && horizontalInput > 0f)
         {
@@ -183,12 +198,109 @@ public class PlayerController : MonoBehaviour
             transform.localScale = localScale;
         }
     }
+    #endregion
+
+    private void HandlePlayerLoadout()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1) && currentSelectedWeapon != SelectedWeapon.Primary)   //Change to primary if not equiped and '1' is pressed
+        {
+            isReloading = false;
+            currentSelectedWeapon = SelectedWeapon.Primary;
+            Debug.Log($"Changed weapon to {currentSelectedWeapon}");
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha3) && currentSelectedWeapon != SelectedWeapon.Melee)  //Change to primary if not equiped and '3' is pressed
+        {
+            isReloading = false;
+            currentSelectedWeapon = SelectedWeapon.Melee;
+            Debug.Log($"Changed weapon to {currentSelectedWeapon}");
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            //Secondary not implemented
+            //play half life loadouta empty sound
+        }
+
+        if (Input.GetKeyDown(KeyCode.R) && currentSelectedWeapon == SelectedWeapon.Primary)
+        {
+            if (!isReloading)
+            {
+                StartCoroutine(PrimaryReload());
+            }
+        }
+    }
+
+    IEnumerator PrimaryReload()
+    {
+        isReloading = true;
+        while (isReloading)
+        {
+            if (currentPrimaryClipContent < primaryClipSize)
+            {
+                yield return new WaitForSeconds(primaryReloadSpeed);
+                if (!isReloading)   //If the nexts reload is cancelled by another action
+                    continue;
+                currentPrimaryClipContent++;
+                audioSource.PlayOneShot(reloadingRocketAudio);
+                Debug.Log("Current Clip Content:" + currentPrimaryClipContent);
+            }
+            else
+            {
+                isReloading = false;
+            }
+        }
+    }
+
+    private void HandlePlayerWeapon()
+    {
+        Vector2 mousePosition = PlayerCamera.ScreenToWorldPoint(Input.mousePosition);
+        if (Input.GetMouseButton(0))
+        {
+            if (currentSelectedWeapon == SelectedWeapon.Primary)
+            {
+                ShootRocket(mousePosition);
+            }
+        }
+    }
+
+    private void ShootRocket(Vector2 mousePosition)
+    {
+        if (canShoot)
+        {
+            if (currentPrimaryClipContent > 0)
+            {
+
+                isReloading = false;
+                audioSource.PlayOneShot(shootingRocketAudio);
+                float angle = Vector2.SignedAngle(Vector2.right, rb.position - mousePosition);
+                Instantiate(spawnedRocket, rb.position, Quaternion.Euler(0, 0, angle + 90));
+                currentPrimaryClipContent--;
+                StartCoroutine(FiringCooldown(primaryFirerate));
+                Debug.Log("Current Clip Content:" + currentPrimaryClipContent);
+            }
+            else
+            {
+                if (!isReloading)
+                {
+                    audioSource.PlayOneShot(clipEmptyAudio);
+                    StartCoroutine(PrimaryReload());
+                }
+            }
+        }
+    }
+
+    private IEnumerator FiringCooldown(float cooldown)
+    {
+        canShoot = false;
+        yield return new WaitForSeconds(cooldown);
+        canShoot = true;
+    }
+
 
     private void HandleReceiveExplosion(Vector2 explosionCenter)
     {
         Vector2 direction = rb.position - explosionCenter;
         direction.Normalize();  // Normalize the direction vector to get only the direction, ignoring magnitude
-        Vector2 knockbackForce = direction * explosionKnockback;
+        Vector2 knockbackForce = direction * explosionSelfKnockback;
         if (!IsGrounded())
         {
             knockbackForce *= rocketJumpBonusFactor; //adds bonus knockback if already in air

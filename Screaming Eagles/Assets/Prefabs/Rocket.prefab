@@ -126,7 +126,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f58584aad193dd34da8f9d25771402d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  projectileSpeed: 25
+  projectileSpeed: 30
   spawnedExplosion: {fileID: 4014121003420161364, guid: f6828b4949514274d85e3cf79111c541, type: 3}
 --- !u!70 &999033212184375262
 CapsuleCollider2D:
