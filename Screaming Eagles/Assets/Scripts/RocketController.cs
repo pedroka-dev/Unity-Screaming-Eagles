@@ -23,12 +23,16 @@ public class RocketController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Ground"))       //todo: collision with mercs
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Ground"))       //todo: collision with mercs; todo 2: dont make layer hardcoded
         {
-            Quaternion randomZRotation = Quaternion.Euler(0, 0, Random.Range(0f, 360f));
-
-            Instantiate(spawnedExplosion, rb.position, randomZRotation);
-            Destroy(gameObject);
+            Explodes();
         }
+    }
+
+    private void Explodes()
+    {
+        Quaternion randomZRotation = Quaternion.Euler(0, 0, Random.Range(0f, 360f));
+        Instantiate(spawnedExplosion, rb.position, randomZRotation);
+        Destroy(gameObject);
     }
 }

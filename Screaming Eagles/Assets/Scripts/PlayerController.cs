@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 enum SelectedWeapon
@@ -36,6 +37,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private AudioClip drawPrimary;
     [SerializeField] private AudioClip drawMelee;
 
+    private Vector2 mousePosition;
     private float aimAngle = 360f;  //scale of 0 to 360 always, counter clockwise
     private bool isFacingRight = true;
     private SelectedWeapon currentSelectedWeapon = SelectedWeapon.Primary;
@@ -58,6 +60,8 @@ public class PlayerController : MonoBehaviour
     private int currentPrimaryClipContent = 4;
 
     [Header("Melee Weapon")]
+    [SerializeField] private float meleeRange = 2f;
+    [SerializeField] private GameObject spawnedMeleeAttack;
     [SerializeField] private AudioClip shovelAttackAudio;
     [SerializeField] private AudioClip shovelAttackCritAudio;
 
@@ -90,7 +94,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Explosion"))
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Explosion"))   //TODO: dont make layer hardcoded
         {
             HandleReceiveExplosion(collision.transform.position);
         }
@@ -206,9 +210,8 @@ public class PlayerController : MonoBehaviour
     #region Attack
     private void HandlePlayerAim()
     {
-        Vector2 mousePosition = PlayerCamera.ScreenToWorldPoint(Input.mousePosition);
+        mousePosition = PlayerCamera.ScreenToWorldPoint(Input.mousePosition);
         aimAngle = Vector2.SignedAngle(Vector2.right, rb.position - mousePosition) + 180;       //garants angle between 0 and 360
-        Debug.Log("Angle " + aimAngle);
         CharacterFlip();
     }
 
@@ -222,7 +225,7 @@ public class PlayerController : MonoBehaviour
             isReloading = false;
             currentSelectedWeapon = SelectedWeapon.Primary;
             audioSource.PlayOneShot(drawPrimary);
-            StartCoroutine(primaryFireCooldown(0.5f));      //Firerate %50 shorter when switching weapons. Feels better when playing
+            StartCoroutine(primaryFireCooldown(0.5f));      //Firerate cooldown %50 shorter when switching weapons. Remember: switching to your shovel is always faster than reloading
             Debug.Log($"Changed weapon to {currentSelectedWeapon}");
         }
         else if (Input.GetKeyDown(KeyCode.Alpha3) && currentSelectedWeapon != SelectedWeapon.Melee)  //Change to primary if not equiped and '3' is pressed
@@ -230,13 +233,13 @@ public class PlayerController : MonoBehaviour
             isReloading = false;
             currentSelectedWeapon = SelectedWeapon.Melee;
             audioSource.PlayOneShot(drawMelee);
-            StartCoroutine(meleeFireCooldown(0.5f));    //Firerate %50 shorter when switching weapons. Feels better when playing
+            StartCoroutine(meleeFireCooldown(0.5f));    //Firerate cooldown %50 shorter when switching weapons. Remember: switching to your shovel is always faster than reloading
             Debug.Log($"Changed weapon to {currentSelectedWeapon}");
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             //Secondary not implemented
-            //play half life loadouta empty sound
+            //play half life loadout empty sound
         }
 
         if (Input.GetKeyDown(KeyCode.R) && currentSelectedWeapon == SelectedWeapon.Primary)
@@ -291,7 +294,7 @@ public class PlayerController : MonoBehaviour
         {
             if (currentPrimaryClipContent > 0)
             {
-
+                //animator.SetTrigget("ShootRocket");
                 isReloading = false;
                 audioSource.PlayOneShot(shootingRocketAudio);
                 Instantiate(spawnedRocket, rb.position, Quaternion.Euler(0, 0, aimAngle));
@@ -314,6 +317,8 @@ public class PlayerController : MonoBehaviour
     {
         if (canShootMelee)
         {
+            //animator.SetTrigget("MeleeSwing");
+
             if (isRocketJumping)
             {
                 audioSource.PlayOneShot(shovelAttackCritAudio);
@@ -323,7 +328,29 @@ public class PlayerController : MonoBehaviour
                 audioSource.PlayOneShot(shovelAttackAudio);
             }
 
-            Debug.Log("Melee Swing!");
+            Vector2 spawnDirection = new(Mathf.Cos(aimAngle * Mathf.Deg2Rad), Mathf.Sin(aimAngle * Mathf.Deg2Rad));
+            Vector2 meleeAttackposition = rb.position + spawnDirection * 2;
+
+            GameObject meleeAttack = Instantiate(spawnedMeleeAttack, meleeAttackposition, new Quaternion());
+
+
+            ContactFilter2D contactFilter = new();
+            contactFilter.useTriggers = true;
+            contactFilter.SetLayerMask(LayerMask.GetMask("Enemy"));
+            contactFilter.useLayerMask = true;
+            //TODO: dont make layer hardcoded; add support for hitting walls when no enemy is hit
+
+            List<Collider2D> hitEnemies = new();
+            int numberOfHits = Physics2D.OverlapCollider(meleeAttack.GetComponent<Collider2D>(),contactFilter, hitEnemies);
+
+            if (numberOfHits > 0)
+            {
+                foreach (Collider2D enemy in hitEnemies)
+                {
+                    Debug.Log("Enemy hit: " + enemy.gameObject.name);
+                }
+            }
+
             StartCoroutine(meleeFireCooldown());
         }
     }
@@ -341,7 +368,6 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(meleeFireRate * weaponSwitchModifier);
         canShootMelee = true;
     }
-
 
     #endregion
 
