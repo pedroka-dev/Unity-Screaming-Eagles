@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 enum SelectedWeapon
@@ -64,6 +65,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject spawnedMeleeAttack;
     [SerializeField] private AudioClip shovelAttackAudio;
     [SerializeField] private AudioClip shovelAttackCritAudio;
+    [SerializeField] private AudioClip hitSoundAudio;
+    [SerializeField] private List<AudioClip> hitCritAudios;
 
     private bool canShootMelee = true;
     private float meleeFireRate = 0.8f;
@@ -243,7 +246,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    //BUG: Sometimes can call this method multiple times, loading at double or even triple speed
+    //BUG: Sometimes can call this method multiple times, loading at double or even triple speed. idk why
     IEnumerator PrimaryReload()
     {
         isReloading = true;
@@ -310,8 +313,8 @@ public class PlayerController : MonoBehaviour
         if (canShootMelee)
         {
             //animator.SetTrigget("MeleeSwing");
-
-            if (isRocketJumping)
+            bool isCrit = isRocketJumping;      //todo: BUG, sometimes isRocketJumping is false even when it should be true
+            if (isCrit)
             {
                 audioSource.PlayOneShot(shovelAttackCritAudio);
             }
@@ -323,7 +326,7 @@ public class PlayerController : MonoBehaviour
             Vector2 spawnDirection = new(Mathf.Cos(aimAngle * Mathf.Deg2Rad), Mathf.Sin(aimAngle * Mathf.Deg2Rad));
             Vector2 meleeAttackposition = rb.position + spawnDirection * 2;
 
-            GameObject meleeAttack = Instantiate(spawnedMeleeAttack, meleeAttackposition, new Quaternion());
+            GameObject meleeAttack = Instantiate(spawnedMeleeAttack, meleeAttackposition, Quaternion.Euler(0, 0, aimAngle));
 
 
             ContactFilter2D contactFilter = new();
@@ -339,6 +342,12 @@ public class PlayerController : MonoBehaviour
             {
                 foreach (Collider2D enemy in hitEnemies)
                 {
+                    audioSource.PlayOneShot(hitSoundAudio,0.3f);    //half volume because this shit is too loud
+                    if (isCrit)
+                    {
+                        int critAudioId = UnityEngine.Random.Range(0, hitCritAudios.Count-1);       //TODO: put this shit in extensions. its very useful
+                        audioSource.PlayOneShot(hitCritAudios.ElementAt(critAudioId));
+                    }
                     Debug.Log("Enemy hit: " + enemy.gameObject.name);
                 }
             }
@@ -373,11 +382,7 @@ public class PlayerController : MonoBehaviour
             knockbackForce *= rocketJumpBonusFactor; //adds bonus knockback if already in air
         }
 
-        // Apply the force to the Rigidbody
         rb.AddForce(knockbackForce, ForceMode2D.Impulse);
-        if (!IsGrounded())
-        {
-            isRocketJumping = true;
-        }
+        isRocketJumping = true;
     }
 }

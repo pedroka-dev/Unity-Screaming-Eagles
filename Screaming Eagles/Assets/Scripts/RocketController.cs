@@ -33,7 +33,7 @@ public class RocketController : MonoBehaviour
     }
 
     /// <summary>
-    /// Gives constant velocity based on the initial rocket rotation angle at Z axis
+    /// Gives constant velocity based on the initial rocket projectile angle at Z axis
     /// </summary>
     void ApplyVelocity()
     {

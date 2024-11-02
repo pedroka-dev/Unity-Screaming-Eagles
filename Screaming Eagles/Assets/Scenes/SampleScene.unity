@@ -2137,6 +2137,13 @@ MonoBehaviour:
   spawnedMeleeAttack: {fileID: 7051355278446960742, guid: 14593cf188ed3164fa5b370ff5e41843, type: 3}
   shovelAttackAudio: {fileID: 8300000, guid: 8a6335c4639951c4c9d1f341fe0b662c, type: 3}
   shovelAttackCritAudio: {fileID: 8300000, guid: a5cecb9af70eaa242beb6d57ebed1330, type: 3}
+  hitSoundAudio: {fileID: 8300000, guid: 057c3b9d2305b5449b6f6b6a86f8182c, type: 3}
+  hitCritAudios:
+  - {fileID: 8300000, guid: a9152564c16c4254289ea07bcff7fb3f, type: 3}
+  - {fileID: 8300000, guid: 0df547bc6b5a75647a3e35be128b8723, type: 3}
+  - {fileID: 8300000, guid: be9d3ee4bf26b694b95e71a31d0c31e8, type: 3}
+  - {fileID: 8300000, guid: 6f2100b31a49ada4b98c23ab45c5e823, type: 3}
+  - {fileID: 8300000, guid: f32721663a0ba7b4d8e85a51e4708431, type: 3}
 --- !u!70 &1839865314
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

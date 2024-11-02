@@ -128,7 +128,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   projectileSpeed: 30
-  AutoDetonationFuseTimeout: 10
+  autoDetonationFuseTimeout: 10
+  damage: 0
   spawnedExplosion: {fileID: 4014121003420161364, guid: f6828b4949514274d85e3cf79111c541, type: 3}
   explosionSound: {fileID: 8300000, guid: b6c729a210054884bb50f4c6473f877a, type: 3}
   collisionLayerMask:
