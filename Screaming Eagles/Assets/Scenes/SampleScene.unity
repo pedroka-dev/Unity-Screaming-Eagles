@@ -2133,7 +2133,8 @@ MonoBehaviour:
   shootingRocketAudio: {fileID: 8300000, guid: dc3707fb5a9922148a0233b051c662a6, type: 3}
   reloadingRocketAudio: {fileID: 8300000, guid: c58a9d9e96df4d446953cd55451741ff, type: 3}
   clipEmptyAudio: {fileID: 8300000, guid: a6adfbae9f532bb4d8035ae85a5fd264, type: 3}
-  meleeRange: 0
+  meleeRange: 3
+  spawnedMeleeAttack: {fileID: 7051355278446960742, guid: 14593cf188ed3164fa5b370ff5e41843, type: 3}
   shovelAttackAudio: {fileID: 8300000, guid: 8a6335c4639951c4c9d1f341fe0b662c, type: 3}
   shovelAttackCritAudio: {fileID: 8300000, guid: a5cecb9af70eaa242beb6d57ebed1330, type: 3}
 --- !u!70 &1839865314
@@ -2182,7 +2183,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -2334,8 +2335,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1959672714}
   - component: {fileID: 1959672713}
+  - component: {fileID: 1959672715}
   m_Layer: 8
-  m_Name: Capsule
+  m_Name: Enemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2408,6 +2410,41 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!70 &1959672715
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1959672712}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_Size: {x: 1, y: 2}
+  m_Direction: 0
 --- !u!1 &1982720503
 GameObject:
   m_ObjectHideFlags: 0

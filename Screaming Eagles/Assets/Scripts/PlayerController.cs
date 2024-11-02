@@ -92,14 +92,6 @@ public class PlayerController : MonoBehaviour
         HandlePlayerMovementPhysics();
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Explosion"))   //TODO: dont make layer hardcoded
-        {
-            HandleReceiveExplosion(collision.transform.position);
-        }
-    }
-
     #region Movement
     private void HandlePlayerMovementInput()
     {
@@ -371,7 +363,7 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
-    private void HandleReceiveExplosion(Vector2 explosionCenter)
+    public void ReceiveExplosion(Vector2 explosionCenter, float damage = 0f)
     {
         Vector2 direction = rb.position - explosionCenter;
         direction.Normalize();  // Normalize the direction vector to get only the direction, ignoring magnitude
