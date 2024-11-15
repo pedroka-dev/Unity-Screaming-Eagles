@@ -28,10 +28,16 @@ public class PlayerController : MonoBehaviour
 
     private bool isJumping;
     private bool isRocketJumping;
-    private float coyoteTime = 0.2f;
+
+    private float rocketJumpBufferTime = 0.2f;  // Rocket jump buffer makes rocket jumping input more forgiving and allows bhop
+    private float rocketJumpBufferCounter;
+
+    private float coyoteTime = 0.2f;    // Coyote time allows player to jump a brief moment after being in the air
     private float coyoteTimeCounter;
-    private float jumpBufferTime = 0.2f;
+
+    private float jumpBufferTime = 0.2f;     // Jump buffer allows player to jump for a brief moment before touching the ground
     private float jumpBufferCounter;
+
 
     [Header("Aiming & Loadout")]
     [SerializeField] private Camera PlayerCamera;
@@ -110,24 +116,22 @@ public class PlayerController : MonoBehaviour
 
         if (IsGrounded() && (horizontalInput == 0 || Math.Abs(currentVelocity) > movementSpeed))
         {
-            // Apply drag to slow the player when there's no input or the velocity exceeds max speed
-            rb.drag = groundedDrag;
+            rb.drag = groundedDrag;     // Apply drag to slow the player when there's no input or the velocity exceeds max speed
         }
         else
         {
-            // Reset drag when moving or in air
-            rb.drag = 0;
-
-            if (!IsGrounded())      //todo: fix trying to change direction on air
-            {
-                targetVelocity *= airControlFactor; // For reducing air control
-            }
+            rb.drag = 0;    // Reset drag when moving or in air
 
             if (horizontalInput != 0)
             {
                 // Calculate the force needed to achieve the target velocity
                 float velocityChange = targetVelocity - currentVelocity;
                 float force = velocityChange * rb.mass / Time.fixedDeltaTime;
+
+                if (!IsGrounded())
+                {
+                    force *= airControlFactor; // Reduces movement control on air
+                }
 
                 // Apply force but cap it to prevent going over the movementSpeed
                 if (Math.Abs(currentVelocity) < movementSpeed || Math.Sign(targetVelocity) != Math.Sign(currentVelocity))
@@ -140,17 +144,23 @@ public class PlayerController : MonoBehaviour
 
     private void HandlePlayerJump()
     {
-        // Coyote time allows player to jump a brief moment after being in the air
+        
         if (IsGrounded())
         {
             coyoteTimeCounter = coyoteTime;
+
+            rocketJumpBufferCounter -= Time.deltaTime;
+            if (rocketJumpBufferCounter <= 0f)
+            {
+                isRocketJumping = false;
+            }
         }
         else
         {
             coyoteTimeCounter -= Time.deltaTime;
-        }
+            rocketJumpBufferCounter = rocketJumpBufferTime;
+        }   
 
-        // Jump buffer allows player to jump for a brief moment before touching the ground
         if (Input.GetButtonDown("Jump"))
         {
             jumpBufferCounter = jumpBufferTime;
@@ -160,12 +170,12 @@ public class PlayerController : MonoBehaviour
             jumpBufferCounter -= Time.deltaTime;
         }
 
-        // Check if the player can jump (coyote time and jump buffer)
+        // Check if the player can jump (considering coyote time and jump buffer)
         if (coyoteTimeCounter > 0f && jumpBufferCounter > 0f && !isJumping)
         {
             //rb.drag = 0;
-            rb.AddForce(new Vector2(0f, jumpingPower), ForceMode2D.Impulse); // Using AddForce for jumping
-
+            rb.AddForce(new Vector2(0f, jumpingPower), ForceMode2D.Impulse);
+            Debug.Log($"JUMP! CoyoteCounter:{coyoteTimeCounter} JumpBufferCounter: {jumpBufferCounter}");
             jumpBufferCounter = 0f;
 
             StartCoroutine(JumpCooldown());
@@ -174,7 +184,7 @@ public class PlayerController : MonoBehaviour
         // Allow for a "variable jump height" by reducing upward velocity when the player releases the jump button
         if (Input.GetButtonUp("Jump") && rb.velocity.y > 0f)
         {
-            rb.AddForce(new Vector2(0f, -rb.velocity.y * 0.5f), ForceMode2D.Impulse); // Smooth deceleration when releasing the jump
+            rb.AddForce(new Vector2(0f, -rb.velocity.y * 0.5f), ForceMode2D.Impulse);   // Smooth deceleration when releasing the jump
             coyoteTimeCounter = 0f;
         }
     }
@@ -197,7 +207,6 @@ public class PlayerController : MonoBehaviour
             localScale.x *= -1f;
             transform.localScale = localScale;
         }
-
     }
     #endregion
 
@@ -212,15 +221,12 @@ public class PlayerController : MonoBehaviour
 
     private void HandlePlayerLoadout()
     {
-        if (IsGrounded())
-            isRocketJumping = false;
-
         if (Input.GetKeyDown(KeyCode.Alpha1) && currentSelectedWeapon != SelectedWeapon.Primary)   //Change to primary if not equiped and '1' is pressed
         {
             isReloading = false;
             currentSelectedWeapon = SelectedWeapon.Primary;
             audioSource.PlayOneShot(drawPrimary);
-            StartCoroutine(primaryFireCooldown(0.5f));      //Firerate cooldown %50 shorter when switching weapons. Remember: switching to your shovel is always faster than reloading
+            StartCoroutine(PrimaryFireCooldown(0.5f));      //Firerate cooldown %50 shorter when switching weapons. Remember: switching to your shovel is always faster than reloading
             Debug.Log($"Changed weapon to {currentSelectedWeapon}");
         }
         else if (Input.GetKeyDown(KeyCode.Alpha3) && currentSelectedWeapon != SelectedWeapon.Melee)  //Change to primary if not equiped and '3' is pressed
@@ -228,7 +234,7 @@ public class PlayerController : MonoBehaviour
             isReloading = false;
             currentSelectedWeapon = SelectedWeapon.Melee;
             audioSource.PlayOneShot(drawMelee);
-            StartCoroutine(meleeFireCooldown(0.5f));    //Firerate cooldown %50 shorter when switching weapons. Remember: switching to your shovel is always faster than reloading
+            StartCoroutine(MeleeFireCooldown(0.5f));    //Firerate cooldown %50 shorter when switching weapons. Remember: switching to your shovel is always faster than reloading
             Debug.Log($"Changed weapon to {currentSelectedWeapon}");
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
@@ -294,7 +300,7 @@ public class PlayerController : MonoBehaviour
                 audioSource.PlayOneShot(shootingRocketAudio);
                 Instantiate(spawnedRocket, rb.position, Quaternion.Euler(0, 0, aimAngle));
                 currentPrimaryClipContent--;
-                StartCoroutine(primaryFireCooldown());
+                StartCoroutine(PrimaryFireCooldown());
                 Debug.Log("Current Clip Content:" + currentPrimaryClipContent);
             }
             else
@@ -313,7 +319,7 @@ public class PlayerController : MonoBehaviour
         if (canShootMelee)
         {
             //animator.SetTrigget("MeleeSwing");
-            bool isCrit = isRocketJumping;      //todo: BUG, sometimes isRocketJumping is false even when it should be true
+            bool isCrit = isRocketJumping;
             if (isCrit)
             {
                 audioSource.PlayOneShot(shovelAttackCritAudio);
@@ -345,25 +351,24 @@ public class PlayerController : MonoBehaviour
                     audioSource.PlayOneShot(hitSoundAudio,0.3f);    //half volume because this shit is too loud
                     if (isCrit)
                     {
-                        int critAudioId = UnityEngine.Random.Range(0, hitCritAudios.Count-1);       //TODO: put this shit in extensions. its very useful
-                        audioSource.PlayOneShot(hitCritAudios.ElementAt(critAudioId));
+                        audioSource.PlayOneShotRandom(hitCritAudios);
                     }
                     Debug.Log("Enemy hit: " + enemy.gameObject.name);
                 }
             }
 
-            StartCoroutine(meleeFireCooldown());
+            StartCoroutine(MeleeFireCooldown());
         }
     }
 
-    private IEnumerator primaryFireCooldown(float weaponSwitchModifier = 1f)
+    private IEnumerator PrimaryFireCooldown(float weaponSwitchModifier = 1f)
     {
         canShootPrimary = false;
         yield return new WaitForSeconds(primaryFirerate * weaponSwitchModifier);
         canShootPrimary = true;
     }
 
-    private IEnumerator meleeFireCooldown(float weaponSwitchModifier = 1f)
+    private IEnumerator MeleeFireCooldown(float weaponSwitchModifier = 1f)
     {
         canShootMelee = false;
         yield return new WaitForSeconds(meleeFireRate * weaponSwitchModifier);
@@ -384,5 +389,6 @@ public class PlayerController : MonoBehaviour
 
         rb.AddForce(knockbackForce, ForceMode2D.Impulse);
         isRocketJumping = true;
+        rocketJumpBufferCounter = rocketJumpBufferTime;
     }
 }

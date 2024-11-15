@@ -1,9 +1,12 @@
+using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public static class UnityExtensions
 {
     /// <summary>
-    /// Extension method to check if a Layer is in a Layermask. 
+    /// LayerMask Extension method to check if a Layer is in a Layermask. 
     /// </summary>
     /// <param name="mask"></param>
     /// <param name="layer"></param>
@@ -11,5 +14,17 @@ public static class UnityExtensions
     public static bool Contains(this LayerMask mask, int layer)
     {
         return mask == (mask | (1 << layer));
+    }
+
+
+    /// <summary>
+    /// AudioSource Extension method that plays OneShot a random AudioClip from a List of AudioClips.
+    /// </summary>
+    /// <param name="audioSource"></param>
+    /// <param name="audioClips"></param>
+    public static void PlayOneShotRandom(this AudioSource audioSource, List<AudioClip> audioClips)
+    {
+        int critAudioId = Random.Range(0, audioClips.Count - 1);
+        audioSource.PlayOneShot(audioClips.ElementAt(critAudioId));
     }
 }
