@@ -29,7 +29,7 @@ public class PlayerController : MonoBehaviour
     private bool isJumping;
     private bool canMarketGardenCrit;
 
-    private readonly float marketGardenBufferTime = 0.1f;  // Market Garden buffer makes market gardening input more forgiving and allows bhoping crits
+    private readonly float marketGardenBufferTime = 0.05f;  // Market Garden buffer makes market gardening input more forgiving and allows bhoping crits
     private float rocketJumpBufferCounter;
 
     private readonly float coyoteTime = 0.2f;    // Coyote time allows player to jump a brief moment after being in the air
