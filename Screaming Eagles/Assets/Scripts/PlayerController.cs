@@ -27,15 +27,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask groundLayer;
 
     private bool isJumping;
-    private bool isRocketJumping;
+    private bool canMarketGardenCrit;
 
-    private float rocketJumpBufferTime = 0.2f;  // Rocket jump buffer makes rocket jumping input more forgiving and allows bhop
+    private readonly float marketGardenBufferTime = 0.1f;  // Market Garden buffer makes market gardening input more forgiving and allows bhoping crits
     private float rocketJumpBufferCounter;
 
-    private float coyoteTime = 0.2f;    // Coyote time allows player to jump a brief moment after being in the air
+    private readonly float coyoteTime = 0.2f;    // Coyote time allows player to jump a brief moment after being in the air
     private float coyoteTimeCounter;
 
-    private float jumpBufferTime = 0.2f;     // Jump buffer allows player to jump for a brief moment before touching the ground
+    private readonly float jumpBufferTime = 0.2f;     // Jump buffer allows player to jump for a brief moment before touching the ground
     private float jumpBufferCounter;
 
 
@@ -120,7 +120,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            rb.drag = 0;    // Reset drag when moving or in air
+            rb.drag = 0;    // Disable drag when moving or in air
 
             if (horizontalInput != 0)
             {
@@ -133,7 +133,7 @@ public class PlayerController : MonoBehaviour
                     force *= airControlFactor; // Reduces movement control on air
                 }
 
-                // Apply force but cap it to prevent going over the movementSpeed
+                // Apply movement force but cap it to prevent going over the movementSpeed
                 if (Math.Abs(currentVelocity) < movementSpeed || Math.Sign(targetVelocity) != Math.Sign(currentVelocity))
                 {
                     rb.AddForce(new Vector2(force, 0));
@@ -152,13 +152,13 @@ public class PlayerController : MonoBehaviour
             rocketJumpBufferCounter -= Time.deltaTime;
             if (rocketJumpBufferCounter <= 0f)
             {
-                isRocketJumping = false;
+                canMarketGardenCrit = false;
             }
         }
         else
         {
             coyoteTimeCounter -= Time.deltaTime;
-            rocketJumpBufferCounter = rocketJumpBufferTime;
+            rocketJumpBufferCounter = marketGardenBufferTime;
         }   
 
         if (Input.GetButtonDown("Jump"))
@@ -173,9 +173,7 @@ public class PlayerController : MonoBehaviour
         // Check if the player can jump (considering coyote time and jump buffer)
         if (coyoteTimeCounter > 0f && jumpBufferCounter > 0f && !isJumping)
         {
-            //rb.drag = 0;
             rb.AddForce(new Vector2(0f, jumpingPower), ForceMode2D.Impulse);
-            Debug.Log($"JUMP! CoyoteCounter:{coyoteTimeCounter} JumpBufferCounter: {jumpBufferCounter}");
             jumpBufferCounter = 0f;
 
             StartCoroutine(JumpCooldown());
@@ -240,7 +238,7 @@ public class PlayerController : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             //Secondary not implemented
-            //play half life loadout empty sound
+            //TODO: play half life loadout empty sound
         }
 
         if (Input.GetKeyDown(KeyCode.R) && currentSelectedWeapon == SelectedWeapon.Primary)
@@ -319,8 +317,7 @@ public class PlayerController : MonoBehaviour
         if (canShootMelee)
         {
             //animator.SetTrigget("MeleeSwing");
-            bool isCrit = isRocketJumping;
-            if (isCrit)
+            if (canMarketGardenCrit)
             {
                 audioSource.PlayOneShot(shovelAttackCritAudio);
             }
@@ -335,11 +332,12 @@ public class PlayerController : MonoBehaviour
             GameObject meleeAttack = Instantiate(spawnedMeleeAttack, meleeAttackposition, Quaternion.Euler(0, 0, aimAngle));
 
 
-            ContactFilter2D contactFilter = new();
-            contactFilter.useTriggers = true;
-            contactFilter.SetLayerMask(LayerMask.GetMask("Enemy"));
-            contactFilter.useLayerMask = true;
-            //TODO: dont make layer hardcoded; add support for hitting walls when no enemy is hit
+            ContactFilter2D contactFilter = new()
+            {
+                useTriggers = true,
+                useLayerMask = true
+            };
+            contactFilter.SetLayerMask(LayerMask.GetMask("Enemy"));     //TODO: dont make layer hardcoded; add support for hitting walls when no enemy is hit
 
             List<Collider2D> hitEnemies = new();
             int numberOfHits = Physics2D.OverlapCollider(meleeAttack.GetComponent<Collider2D>(),contactFilter, hitEnemies);
@@ -348,10 +346,11 @@ public class PlayerController : MonoBehaviour
             {
                 foreach (Collider2D enemy in hitEnemies)
                 {
-                    audioSource.PlayOneShot(hitSoundAudio,0.3f);    //half volume because this shit is too loud
-                    if (isCrit)
+                    audioSource.PlayOneShot(hitSoundAudio,0.25f);    //this shit is too loud
+                    if (canMarketGardenCrit)
                     {
                         audioSource.PlayOneShotRandom(hitCritAudios);
+                        canMarketGardenCrit = false;    //consumes the crit. for balancing reasons, only 1 market gardener crit is allowed per rocket jump
                     }
                     Debug.Log("Enemy hit: " + enemy.gameObject.name);
                 }
@@ -388,7 +387,7 @@ public class PlayerController : MonoBehaviour
         }
 
         rb.AddForce(knockbackForce, ForceMode2D.Impulse);
-        isRocketJumping = true;
-        rocketJumpBufferCounter = rocketJumpBufferTime;
+        canMarketGardenCrit = true;
+        rocketJumpBufferCounter = marketGardenBufferTime;
     }
 }

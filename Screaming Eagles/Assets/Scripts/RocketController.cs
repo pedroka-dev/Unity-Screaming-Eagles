@@ -13,6 +13,7 @@ public class RocketController : MonoBehaviour
     [SerializeField] private GameObject spawnedExplosion;
     [SerializeField] private AudioClip explosionSound;
     [SerializeField] private LayerMask collisionLayerMask;
+    [SerializeField] private ParticleSystem rocketSmokeTrail;
 
     private bool hasExploded = false;
     void Start()
@@ -47,6 +48,7 @@ public class RocketController : MonoBehaviour
         if (!hasExploded)
         {
             audioSource.PlayOneShot(explosionSound);
+            rocketSmokeTrail.Stop();
             Quaternion randomZRotation = Quaternion.Euler(0, 0, Random.Range(0f, 360f));
             GameObject explosionObject = Instantiate(spawnedExplosion, rb.position, randomZRotation);
             DamageMercenaries(explosionObject);
