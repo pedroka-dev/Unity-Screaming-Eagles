@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-enum SelectedWeapon
+public enum SelectedWeapon
 {
     Primary,
     Seecondary,
@@ -40,6 +40,8 @@ public class PlayerController : MonoBehaviour
 
 
     [Header("Aiming & Loadout")]
+    public SelectedWeapon CurrentSelectedWeapon = SelectedWeapon.Primary;
+
     [SerializeField] private Camera PlayerCamera;
     [SerializeField] private AudioClip drawPrimary;
     [SerializeField] private AudioClip drawMelee;
@@ -47,9 +49,11 @@ public class PlayerController : MonoBehaviour
     private Vector2 mousePosition;
     private float aimAngle = 360f;  //scale of 0 to 360 always, counter clockwise
     private bool isFacingRight = true;
-    private SelectedWeapon currentSelectedWeapon = SelectedWeapon.Primary;
+
 
     [Header("Primary Weapon")]
+    public int currentPrimaryClipContent = 4;
+
     [SerializeField] private float explosionSelfKnockback = 20f;
     [SerializeField] private float rocketJumpBonusFactor = 1.5f;
     [SerializeField] private GameObject spawnedRocket;
@@ -64,7 +68,6 @@ public class PlayerController : MonoBehaviour
 
     private bool canShootPrimary = true;
     private bool isReloading = false;
-    private int currentPrimaryClipContent = 4;
 
     [Header("Melee Weapon")]
     [SerializeField] private float meleeRange = 2f;
@@ -219,21 +222,19 @@ public class PlayerController : MonoBehaviour
 
     private void HandlePlayerLoadout()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1) && currentSelectedWeapon != SelectedWeapon.Primary)   //Change to primary if not equiped and '1' is pressed
+        if (Input.GetKeyDown(KeyCode.Alpha1) && CurrentSelectedWeapon != SelectedWeapon.Primary)   //Change to primary if not equiped and '1' is pressed
         {
             isReloading = false;
-            currentSelectedWeapon = SelectedWeapon.Primary;
+            CurrentSelectedWeapon = SelectedWeapon.Primary;
             audioSource.PlayOneShot(drawPrimary);
             StartCoroutine(PrimaryFireCooldown(0.5f));      //Firerate cooldown %50 shorter when switching weapons. Remember: switching to your shovel is always faster than reloading
-            Debug.Log($"Changed weapon to {currentSelectedWeapon}");
         }
-        else if (Input.GetKeyDown(KeyCode.Alpha3) && currentSelectedWeapon != SelectedWeapon.Melee)  //Change to primary if not equiped and '3' is pressed
+        else if (Input.GetKeyDown(KeyCode.Alpha3) && CurrentSelectedWeapon != SelectedWeapon.Melee)  //Change to primary if not equiped and '3' is pressed
         {
             isReloading = false;
-            currentSelectedWeapon = SelectedWeapon.Melee;
+            CurrentSelectedWeapon = SelectedWeapon.Melee;
             audioSource.PlayOneShot(drawMelee);
             StartCoroutine(MeleeFireCooldown(0.5f));    //Firerate cooldown %50 shorter when switching weapons. Remember: switching to your shovel is always faster than reloading
-            Debug.Log($"Changed weapon to {currentSelectedWeapon}");
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
@@ -241,7 +242,7 @@ public class PlayerController : MonoBehaviour
             //TODO: play half life loadout empty sound
         }
 
-        if (Input.GetKeyDown(KeyCode.R) && currentSelectedWeapon == SelectedWeapon.Primary)
+        if (Input.GetKeyDown(KeyCode.R) && CurrentSelectedWeapon == SelectedWeapon.Primary)
         {
             if (!isReloading)
             {
@@ -263,7 +264,6 @@ public class PlayerController : MonoBehaviour
                     break;
                 currentPrimaryClipContent++;
                 audioSource.PlayOneShot(reloadingRocketAudio);
-                Debug.Log("Current Clip Content:" + currentPrimaryClipContent);
             }
             else
             {
@@ -276,11 +276,11 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetMouseButton(0))
         {
-            if (currentSelectedWeapon == SelectedWeapon.Primary)
+            if (CurrentSelectedWeapon == SelectedWeapon.Primary)
             {
                 ShootPrimary();
             }
-            else if(currentSelectedWeapon == SelectedWeapon.Melee)
+            else if(CurrentSelectedWeapon == SelectedWeapon.Melee)
             {
                 SwingMelee();
             }
@@ -299,7 +299,6 @@ public class PlayerController : MonoBehaviour
                 Instantiate(spawnedRocket, rb.position, Quaternion.Euler(0, 0, aimAngle));
                 currentPrimaryClipContent--;
                 StartCoroutine(PrimaryFireCooldown());
-                Debug.Log("Current Clip Content:" + currentPrimaryClipContent);
             }
             else
             {
