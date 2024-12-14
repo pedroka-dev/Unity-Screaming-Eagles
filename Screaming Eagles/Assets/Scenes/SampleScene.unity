@@ -1100,6 +1100,16 @@ Transform:
   - {fileID: 1025079832}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!212 &562099936 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: -2046839363360815281, guid: e700d0439ace98b419e357408e002b8a, type: 3}
+  m_PrefabInstance: {fileID: 1945555291}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &593250703 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: -5340975165886698334, guid: e700d0439ace98b419e357408e002b8a, type: 3}
+  m_PrefabInstance: {fileID: 1945555291}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
@@ -2004,6 +2014,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 547317801}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!212 &1173100615 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 6197399116358855388, guid: e700d0439ace98b419e357408e002b8a, type: 3}
+  m_PrefabInstance: {fileID: 1945555291}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1182447727
 GameObject:
   m_ObjectHideFlags: 0
@@ -2297,6 +2312,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 547317801}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!212 &1427599798 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 3135219579826631623, guid: e700d0439ace98b419e357408e002b8a, type: 3}
+  m_PrefabInstance: {fileID: 1945555291}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1578416288
 GameObject:
   m_ObjectHideFlags: 0
@@ -2328,6 +2348,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1839865308}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!212 &1624365934 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 6967605590704851125, guid: e700d0439ace98b419e357408e002b8a, type: 3}
+  m_PrefabInstance: {fileID: 1945555291}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1628858562
 GameObject:
   m_ObjectHideFlags: 0
@@ -2599,6 +2624,14 @@ MonoBehaviour:
   PlayerCamera: {fileID: 519420031}
   drawPrimary: {fileID: 8300000, guid: fd475217cec91b043b240821e2f42662, type: 3}
   drawMelee: {fileID: 8300000, guid: 70eb963c349073943807f5a2d191c215, type: 3}
+  soldierPrimarySprite:
+  - {fileID: 562099936}
+  - {fileID: 1624365934}
+  - {fileID: 1856777882}
+  soldierMeleeSprite:
+  - {fileID: 1173100615}
+  - {fileID: 593250703}
+  - {fileID: 1427599798}
   currentPrimaryClipContent: 4
   explosionSelfKnockback: 20
   rocketJumpBonusFactor: 1.5
@@ -2748,6 +2781,11 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!212 &1856777882 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 4670637923639075862, guid: e700d0439ace98b419e357408e002b8a, type: 3}
+  m_PrefabInstance: {fileID: 1945555291}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1945555291
 PrefabInstance:
   m_ObjectHideFlags: 0

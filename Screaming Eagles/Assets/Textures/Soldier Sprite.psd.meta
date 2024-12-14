@@ -1451,6 +1451,69 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: -1, y: -3}
     spritePosition: {x: 16, y: 91}
+  - name: Hand R Shovel
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    rect:
+      serializedVersion: 2
+      x: 420
+      y: 38
+      width: 32
+      height: 29
+    spriteID: b714f3cf6efaf7244abecfd301fffd06
+    spriteBone: []
+    spriteOutline: []
+    vertices: []
+    spritePhysicsOutline: []
+    indices: 
+    edges: []
+    tessellationDetail: 0
+    uvTransform: {x: 418, y: 37}
+    spritePosition: {x: 34, y: 101}
+  - name: Market Gardener
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    rect:
+      serializedVersion: 2
+      x: 236
+      y: 105
+      width: 31
+      height: 133
+    spriteID: e895c0e286366574c8db8a65754dc4e7
+    spriteBone: []
+    spriteOutline: []
+    vertices: []
+    spritePhysicsOutline: []
+    indices: 
+    edges: []
+    tessellationDetail: 0
+    uvTransform: {x: 225, y: 103}
+    spritePosition: {x: 35, y: 84}
+  - name: Hand L Hanging
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    rect:
+      serializedVersion: 2
+      x: 460
+      y: 38
+      width: 32
+      height: 28
+    spriteID: 1f4820c1d76a72c41a042aae5e00a7a5
+    spriteBone: []
+    spriteOutline: []
+    vertices: []
+    spritePhysicsOutline: []
+    indices: 
+    edges: []
+    tessellationDetail: 0
+    uvTransform: {x: 458, y: 37}
+    spritePosition: {x: 165, y: 52}
   - name: Foot R
     originalName: 
     pivot: {x: 0.5, y: 0.5}
@@ -1458,8 +1521,8 @@ ScriptedImporter:
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
       serializedVersion: 2
-      x: 263
-      y: 4
+      x: 143
+      y: 212
       width: 57
       height: 26
     spriteID: 14299dcbb1155364c9c44c067aa2385a
@@ -1763,7 +1826,7 @@ ScriptedImporter:
     - {x: 22, y: 23}
     - {x: 23, y: 24}
     tessellationDetail: 0
-    uvTransform: {x: 263, y: 2}
+    uvTransform: {x: 143, y: 210}
     spritePosition: {x: 68, y: 15}
   - name: Foot L
     originalName: 
@@ -1772,7 +1835,7 @@ ScriptedImporter:
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
       serializedVersion: 2
-      x: 328
+      x: 263
       y: 4
       width: 57
       height: 26
@@ -2068,7 +2131,7 @@ ScriptedImporter:
     - {x: 22, y: 23}
     - {x: 23, y: 24}
     tessellationDetail: 0
-    uvTransform: {x: 328, y: 2}
+    uvTransform: {x: 263, y: 2}
     spritePosition: {x: 132, y: 15}
   - name: Grenade 2
     originalName: 
@@ -3562,7 +3625,7 @@ ScriptedImporter:
     layerID: 0
     mosaicPosition: {x: 420, y: 38}
     flatten: 0
-    isImported: 0
+    isImported: 1
     isVisible: 1
   - name: Market Gardener
     spriteName: Market Gardener
@@ -3572,7 +3635,7 @@ ScriptedImporter:
     layerID: 0
     mosaicPosition: {x: 236, y: 105}
     flatten: 0
-    isImported: 0
+    isImported: 1
     isVisible: 1
   - name: Hand L Hanging
     spriteName: Hand L Hanging
@@ -3582,7 +3645,7 @@ ScriptedImporter:
     layerID: 0
     mosaicPosition: {x: 460, y: 38}
     flatten: 0
-    isImported: 0
+    isImported: 1
     isVisible: 1
   - name: Foot R
     spriteName: Foot R
@@ -3590,7 +3653,7 @@ ScriptedImporter:
     parentIndex: -1
     spriteID: 14299dcbb1155364c9c44c067aa2385a
     layerID: 0
-    mosaicPosition: {x: 263, y: 4}
+    mosaicPosition: {x: 143, y: 212}
     flatten: 0
     isImported: 1
     isVisible: 1
@@ -3600,7 +3663,7 @@ ScriptedImporter:
     parentIndex: -1
     spriteID: 943c6cc5d2f6cb64a9be1913eb8f4b69
     layerID: 0
-    mosaicPosition: {x: 328, y: 4}
+    mosaicPosition: {x: 263, y: 4}
     flatten: 0
     isImported: 1
     isVisible: 1
@@ -3641,19 +3704,19 @@ ScriptedImporter:
     layerId: 0
     flatten: 0
     isGroup: 0
-    importLayer: 0
+    importLayer: 1
   - spriteId: e895c0e286366574c8db8a65754dc4e7
     name: Market Gardener
     layerId: 0
     flatten: 0
     isGroup: 0
-    importLayer: 0
+    importLayer: 1
   - spriteId: 1f4820c1d76a72c41a042aae5e00a7a5
     name: Hand L Hanging
     layerId: 0
     flatten: 0
     isGroup: 0
-    importLayer: 0
+    importLayer: 1
   importFileNodeState: 1
   platformSettingsDirtyTick: 638655560105129545
   spriteSizeExpandChanged: 0

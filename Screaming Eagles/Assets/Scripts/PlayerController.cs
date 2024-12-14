@@ -45,6 +45,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Camera PlayerCamera;
     [SerializeField] private AudioClip drawPrimary;
     [SerializeField] private AudioClip drawMelee;
+    [SerializeField] private List<SpriteRenderer> soldierPrimarySprite;
+    [SerializeField] private List<SpriteRenderer> soldierMeleeSprite;
 
     private Vector2 mousePosition;
     private float aimAngle = 360f;  //scale of 0 to 360 always, counter clockwise
@@ -88,6 +90,7 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         audioSource = GetComponent<AudioSource>();
+        UpdateWeaponSprite();
     }
 
     private void Update()
@@ -228,6 +231,7 @@ public class PlayerController : MonoBehaviour
             CurrentSelectedWeapon = SelectedWeapon.Primary;
             audioSource.PlayOneShot(drawPrimary);
             StartCoroutine(PrimaryFireCooldown(0.5f));      //Firerate cooldown %50 shorter when switching weapons. Remember: switching to your shovel is always faster than reloading
+            UpdateWeaponSprite();
         }
         else if (Input.GetKeyDown(KeyCode.Alpha3) && CurrentSelectedWeapon != SelectedWeapon.Melee)  //Change to primary if not equiped and '3' is pressed
         {
@@ -235,6 +239,7 @@ public class PlayerController : MonoBehaviour
             CurrentSelectedWeapon = SelectedWeapon.Melee;
             audioSource.PlayOneShot(drawMelee);
             StartCoroutine(MeleeFireCooldown(0.5f));    //Firerate cooldown %50 shorter when switching weapons. Remember: switching to your shovel is always faster than reloading
+            UpdateWeaponSprite();
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
@@ -248,6 +253,20 @@ public class PlayerController : MonoBehaviour
             {
                 StartCoroutine(PrimaryReload());
             }
+        }
+    }
+
+    private void UpdateWeaponSprite()
+    {
+        //this is a TERRIBLE and RETARDED way of doing this. but it will work for now
+        foreach(SpriteRenderer spriteRenderer in soldierPrimarySprite)
+        {
+            spriteRenderer.enabled = CurrentSelectedWeapon == SelectedWeapon.Primary;
+        }
+
+        foreach (SpriteRenderer sprite in soldierMeleeSprite)
+        {
+            sprite.enabled = CurrentSelectedWeapon == SelectedWeapon.Melee;
         }
     }
 
@@ -299,6 +318,7 @@ public class PlayerController : MonoBehaviour
                 Instantiate(spawnedRocket, rb.position, Quaternion.Euler(0, 0, aimAngle));
                 currentPrimaryClipContent--;
                 StartCoroutine(PrimaryFireCooldown());
+
             }
             else
             {
