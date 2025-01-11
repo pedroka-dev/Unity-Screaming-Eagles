@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public enum SelectedWeapon
 {
@@ -44,6 +46,7 @@ public class PlayerController : MonoBehaviour
     public SelectedWeapon CurrentSelectedWeapon = SelectedWeapon.Primary;
 
     [SerializeField] private GameObject spawnedDamagePopup;
+    [SerializeField] private GameObject spawnedCritPopup;
     [SerializeField] private Camera PlayerCamera;
     [SerializeField] private AudioClip drawPrimary;
     [SerializeField] private AudioClip drawMelee;
@@ -384,10 +387,14 @@ public class PlayerController : MonoBehaviour
             {
                 hitDamage *= 3;
                 canMarketGardenCrit = false;    //consumes the crit. for balancing reasons, only 1 market gardener crit is allowed per rocket jump
+                Instantiate(spawnedCritPopup, enemy.transform.position, new Quaternion());
                 audioSource.PlayOneShotRandom(hitCritAudios);
             }
 
-            GameObject damagePopUp = Instantiate(spawnedDamagePopup, enemy.transform.position, new Quaternion());
+            float randomPositionOffset = Random.Range(-1f, 1f);  //Damage popup just looks better with a bit of offset. Feels more dynamic and keeps visually separated from the crit popup 
+            Vector2 enemyPositionWithOffset = new(enemy.transform.position.x + randomPositionOffset, enemy.transform.position.y + randomPositionOffset / 2);
+
+            GameObject damagePopUp = Instantiate(spawnedDamagePopup, enemyPositionWithOffset, new Quaternion());
             damagePopUp.GetComponent<DamagePopUpController>().SetText(hitDamage);
             //enemy.ReceiveDamage(hitDamage);
         }
