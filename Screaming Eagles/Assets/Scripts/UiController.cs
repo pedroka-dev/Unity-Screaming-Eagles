@@ -11,7 +11,7 @@ public class UiController : MonoBehaviour
     private Label lblWeaponEquiped;
     private Label lblClipSize;
 
-    void Start()
+    private void Awake()
     {
         VisualElement root = GetComponent<UIDocument>().rootVisualElement;
 
@@ -19,7 +19,7 @@ public class UiController : MonoBehaviour
         lblClipSize = root.Q<Label>("lblClipSize");
     }
 
-    void Update()
+    private void Update()
     {
         switch (playerController.CurrentSelectedWeapon) //Uses Hardcoded weapon names. Should update if add more weapons
         {

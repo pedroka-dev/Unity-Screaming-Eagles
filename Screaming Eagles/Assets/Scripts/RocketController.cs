@@ -16,10 +16,15 @@ public class RocketController : MonoBehaviour
     [SerializeField] private ParticleSystem rocketSmokeTrail;
 
     private bool hasExploded = false;
-    void Start()
+
+    private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         audioSource = GetComponent<AudioSource>();
+    }
+
+    private void Start()
+    {
         ApplyVelocity();
         StartCoroutine(DetonateAfterFuseTimeout(autoDetonationFuseTimeout));
     }
@@ -51,7 +56,7 @@ public class RocketController : MonoBehaviour
             rocketSmokeTrail.Stop();
             Quaternion randomZRotation = Quaternion.Euler(0, 0, Random.Range(0f, 360f));
             GameObject explosionObject = Instantiate(spawnedExplosion, rb.position, randomZRotation);
-            DamageMercenaries(explosionObject);
+            SplashDamageMercenaries(explosionObject);
 
             gameObject.GetComponent<Renderer>().enabled = false;    //Hides the rocket from view without stopping the audioclip
             StartCoroutine(DestroyAfterAudioClipEnds());
@@ -59,10 +64,12 @@ public class RocketController : MonoBehaviour
         }
     }
 
-    private void DamageMercenaries(GameObject explosion)
+    private void SplashDamageMercenaries(GameObject explosion)
     {
-        ContactFilter2D contactFilter = new();
-        contactFilter.useTriggers = true;
+        ContactFilter2D contactFilter = new()
+        {
+            useTriggers = true
+        };
         contactFilter.SetLayerMask(LayerMask.GetMask("Mercenary"));         //TODO: dont make layer hardcoded; allow explosions to affect both players and enemies, besides when its rocket jumper explosion
         contactFilter.useLayerMask = true;
 

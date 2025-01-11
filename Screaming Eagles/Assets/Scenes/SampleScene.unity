@@ -498,7 +498,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -23.572268, y: 0.82677484, z: 1.0323188}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1.25, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 547317801}
@@ -1437,7 +1437,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -69.422264, y: -5.8932247, z: 1.0323188}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1.25, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 547317801}
@@ -2009,7 +2009,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 60.747734, y: 2.206775, z: 1.0323188}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1.25, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 547317801}
@@ -2621,6 +2621,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   CurrentSelectedWeapon: 0
+  spawnedDamagePopup: {fileID: 986486104005465942, guid: c4844c9efdae1c2438392d86ace0dec1, type: 3}
   PlayerCamera: {fileID: 519420031}
   drawPrimary: {fileID: 8300000, guid: fd475217cec91b043b240821e2f42662, type: 3}
   drawMelee: {fileID: 8300000, guid: 70eb963c349073943807f5a2d191c215, type: 3}
@@ -2923,7 +2924,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 11.657732, y: -8.843225, z: 1.0323188}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1.25, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 547317801}
@@ -3207,8 +3208,8 @@ Transform:
   m_GameObject: {fileID: 2129300603}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 93.15773, y: -7.703225, z: 1.0323188}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 93.15773, y: -7.87, z: 1.0323188}
+  m_LocalScale: {x: 1, y: 1.25, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 547317801}

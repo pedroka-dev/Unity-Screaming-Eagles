@@ -40,13 +40,16 @@ public class PlayerController : MonoBehaviour
 
 
     [Header("Aiming & Loadout")]
+
     public SelectedWeapon CurrentSelectedWeapon = SelectedWeapon.Primary;
 
+    [SerializeField] private GameObject spawnedDamagePopup;
     [SerializeField] private Camera PlayerCamera;
     [SerializeField] private AudioClip drawPrimary;
     [SerializeField] private AudioClip drawMelee;
     [SerializeField] private List<SpriteRenderer> soldierPrimarySprite;
     [SerializeField] private List<SpriteRenderer> soldierMeleeSprite;
+    
 
     private Vector2 mousePosition;
     private float aimAngle = 360f;  //scale of 0 to 360 always, counter clockwise
@@ -81,15 +84,19 @@ public class PlayerController : MonoBehaviour
 
     private bool canShootMelee = true;
     private float meleeFireRate = 0.8f;
-    private float meleeDamage = 65f;
+    private int meleeDamage = 65;
 
     private bool IsGrounded() => Physics2D.OverlapCircle(groundCheck.position, 0.25f, groundLayer);
     private AudioSource audioSource;
 
-    private void Start()
+    private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         audioSource = GetComponent<AudioSource>();
+    }
+
+    private void Start()
+    {
         UpdateWeaponSprite();
     }
 
@@ -199,8 +206,6 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(0.4f);
         isJumping = false;
     }
-
-
 
     private void CharacterFlip()
     {
@@ -350,7 +355,6 @@ public class PlayerController : MonoBehaviour
 
             GameObject meleeAttack = Instantiate(spawnedMeleeAttack, meleeAttackposition, Quaternion.Euler(0, 0, aimAngle));
 
-
             ContactFilter2D contactFilter = new()
             {
                 useTriggers = true,
@@ -358,24 +362,34 @@ public class PlayerController : MonoBehaviour
             };
             contactFilter.SetLayerMask(LayerMask.GetMask("Enemy"));     //TODO: dont make layer hardcoded; add support for hitting walls when no enemy is hit
 
-            List<Collider2D> hitEnemies = new();
-            int numberOfHits = Physics2D.OverlapCollider(meleeAttack.GetComponent<Collider2D>(),contactFilter, hitEnemies);
+            List<Collider2D> enemiesHit = new();
+            int numberOfHits = Physics2D.OverlapCollider(meleeAttack.GetComponent<Collider2D>(),contactFilter, enemiesHit);
 
             if (numberOfHits > 0)
             {
-                foreach (Collider2D enemy in hitEnemies)
-                {
-                    audioSource.PlayOneShot(hitSoundAudio,0.25f);    //this shit is too loud
-                    if (canMarketGardenCrit)
-                    {
-                        audioSource.PlayOneShotRandom(hitCritAudios);
-                        canMarketGardenCrit = false;    //consumes the crit. for balancing reasons, only 1 market gardener crit is allowed per rocket jump
-                    }
-                    Debug.Log("Enemy hit: " + enemy.gameObject.name);
-                }
+                MeleeHitEnemies(enemiesHit);
             }
 
             StartCoroutine(MeleeFireCooldown());
+        }
+    }
+
+    private void MeleeHitEnemies(List<Collider2D> enemiesHit)
+    {
+        foreach (Collider2D enemy in enemiesHit)
+        {
+            int hitDamage = meleeDamage;
+            audioSource.PlayOneShot(hitSoundAudio, 0.25f);    //this shit is too loud
+            if (canMarketGardenCrit)
+            {
+                hitDamage *= 3;
+                canMarketGardenCrit = false;    //consumes the crit. for balancing reasons, only 1 market gardener crit is allowed per rocket jump
+                audioSource.PlayOneShotRandom(hitCritAudios);
+            }
+
+            GameObject damagePopUp = Instantiate(spawnedDamagePopup, enemy.transform.position, new Quaternion());
+            damagePopUp.GetComponent<DamagePopUpController>().SetText(hitDamage);
+            //enemy.ReceiveDamage(hitDamage);
         }
     }
 
@@ -395,8 +409,9 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
-    public void ReceiveExplosion(Vector2 explosionCenter, float damage = 0f)
+    public void ReceiveExplosion(Vector2 explosionCenter, int damage = 0)
     {
+        //this.ReceiveDamage(damage);
         Vector2 direction = rb.position - explosionCenter;
         direction.Normalize();  // Normalize the direction vector to get only the direction, ignoring magnitude
         Vector2 knockbackForce = direction * explosionSelfKnockback;
