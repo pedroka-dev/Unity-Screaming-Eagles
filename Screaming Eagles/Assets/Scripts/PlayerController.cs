@@ -1,8 +1,7 @@
+using Assets.Scripts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -16,19 +15,15 @@ public enum SelectedWeapon
 public class PlayerController : MonoBehaviour
 {
     Rigidbody2D rb;
+    AudioSource audioSource;
 
-    [Header("Movement")]
-    [SerializeField] private float movementSpeed = 8f;
-    [SerializeField] private float groundedDrag = 1f;
-    [SerializeField] private float airControlFactor = 0.5f;
+    [SerializeField] private MercenaryController mercenary;
+
+    [Header("Movement & Jumping")]
     private float horizontalInput;
-
-    [Header("Jumping")]
-    [SerializeField] private float jumpingPower = 16f;
     [SerializeField] private Transform groundCheck;
     [SerializeField] private LayerMask groundLayer;
 
-    private bool isJumping;
     private bool canMarketGardenCrit;
 
     private readonly float marketGardenBufferTime = 0.05f;  // Market Garden buffer makes market gardening input more forgiving and allows bhoping crits
@@ -42,9 +37,7 @@ public class PlayerController : MonoBehaviour
 
 
     [Header("Aiming & Loadout")]
-
     public SelectedWeapon CurrentSelectedWeapon = SelectedWeapon.Primary;
-
     [SerializeField] private GameObject spawnedDamagePopup;
     [SerializeField] private GameObject spawnedCritPopup;
     [SerializeField] private Camera PlayerCamera;
@@ -53,15 +46,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private List<SpriteRenderer> soldierPrimarySprite;
     [SerializeField] private List<SpriteRenderer> soldierMeleeSprite;
     
-
     private Vector2 mousePosition;
     private float aimAngle = 360f;  //scale of 0 to 360 always, counter clockwise
-    private bool isFacingRight = true;
-
+    
 
     [Header("Primary Weapon")]
     public int currentPrimaryClipContent = 4;
-
     [SerializeField] private float explosionSelfKnockback = 20f;
     [SerializeField] private float rocketJumpBonusFactor = 1.5f;
     [SerializeField] private GameObject spawnedRocket;
@@ -90,7 +80,7 @@ public class PlayerController : MonoBehaviour
     private int meleeDamage = 65;
 
     private bool IsGrounded() => Physics2D.OverlapCircle(groundCheck.position, 0.25f, groundLayer);
-    private AudioSource audioSource;
+    
 
     private void Awake()
     {
@@ -128,11 +118,11 @@ public class PlayerController : MonoBehaviour
     private void HandlePlayerMovementPhysics()
     {
         var currentVelocity = rb.velocity.x;
-        float targetVelocity = horizontalInput * movementSpeed;
+        float targetVelocity = horizontalInput * mercenary.MaxMovementSpeed;
 
-        if (IsGrounded() && (horizontalInput == 0 || Math.Abs(currentVelocity) > movementSpeed))
+        if (IsGrounded() && (horizontalInput == 0 || Math.Abs(currentVelocity) > mercenary.MaxMovementSpeed))
         {
-            rb.drag = groundedDrag;     // Apply drag to slow the player when there's no input or the velocity exceeds max speed
+            rb.drag = MercenaryController.DEFAULT_GROUND_DRAG;     // Apply drag to slow the player when there's no input or the velocity exceeds max speed, while grounded
         }
         else
         {
@@ -146,11 +136,11 @@ public class PlayerController : MonoBehaviour
 
                 if (!IsGrounded())
                 {
-                    force *= airControlFactor; // Reduces movement control on air
+                    force *= MercenaryController.DEFAULT_AIR_CONTROL_FACTOR; // Reduces movement control on air
                 }
 
                 // Apply movement force but cap it to prevent going over the movementSpeed
-                if (Math.Abs(currentVelocity) < movementSpeed || Math.Sign(targetVelocity) != Math.Sign(currentVelocity))
+                if (Math.Abs(currentVelocity) < mercenary.MaxMovementSpeed || Math.Sign(targetVelocity) != Math.Sign(currentVelocity))
                 {
                     rb.AddForce(new Vector2(force, 0));
                 }
@@ -160,7 +150,6 @@ public class PlayerController : MonoBehaviour
 
     private void HandlePlayerJump()
     {
-        
         if (IsGrounded())
         {
             coyoteTimeCounter = coyoteTime;
@@ -187,12 +176,10 @@ public class PlayerController : MonoBehaviour
         }
 
         // Check if the player can jump (considering coyote time and jump buffer)
-        if (coyoteTimeCounter > 0f && jumpBufferCounter > 0f && !isJumping)
+        if (coyoteTimeCounter > 0f && jumpBufferCounter > 0f && !mercenary.IsJumping)
         {
-            rb.AddForce(new Vector2(0f, jumpingPower), ForceMode2D.Impulse);
+            mercenary.Jump();
             jumpBufferCounter = 0f;
-
-            StartCoroutine(JumpCooldown());
         }
 
         // Allow for a "variable jump height" by reducing upward velocity when the player releases the jump button
@@ -202,24 +189,7 @@ public class PlayerController : MonoBehaviour
             coyoteTimeCounter = 0f;
         }
     }
-
-    private IEnumerator JumpCooldown()
-    {
-        isJumping = true;
-        yield return new WaitForSeconds(0.4f);
-        isJumping = false;
-    }
-
-    private void CharacterFlip()
-    {
-        if (isFacingRight && (aimAngle > 95 && aimAngle < 265) || !isFacingRight && (aimAngle < 85 || aimAngle > 275))      //Verifiy if player is aiming on the right or left side of the character, with a 10 degrees blindspot
-        {
-            Vector2 localScale = transform.localScale;
-            isFacingRight = !isFacingRight;
-            localScale.x *= -1f;
-            transform.localScale = localScale;
-        }
-    }
+   
     #endregion
 
 
@@ -228,7 +198,10 @@ public class PlayerController : MonoBehaviour
     {
         mousePosition = PlayerCamera.ScreenToWorldPoint(Input.mousePosition);
         aimAngle = Vector2.SignedAngle(Vector2.right, rb.position - mousePosition) + 180;       //garants angle between 0 and 360
-        CharacterFlip();
+        if (mercenary.IsFacingRight && (aimAngle > 95 && aimAngle < 265) || !mercenary.IsFacingRight && (aimAngle < 85 || aimAngle > 275))
+        {
+            mercenary.CharacterFlip(transform);
+        }
     }
 
     private void HandlePlayerLoadout()

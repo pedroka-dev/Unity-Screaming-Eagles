@@ -23,8 +23,6 @@ public class CritialHitPopUpController : MonoBehaviour
         currenTextColor = textMesh.color;
     }
 
-
-
     private void Update()
     {
         FadeAwayCrit();

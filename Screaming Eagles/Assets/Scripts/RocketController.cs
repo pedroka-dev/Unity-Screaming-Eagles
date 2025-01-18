@@ -80,9 +80,9 @@ public class RocketController : MonoBehaviour
         {
             foreach (Collider2D enemy in hitEnemies)
             {
-                if(enemy.gameObject.TryGetComponent<PlayerController>(out var mercenaaryController))
+                if(enemy.gameObject.TryGetComponent<PlayerController>(out var mercenaryController))
                 {
-                    mercenaaryController.ReceiveExplosion(explosion.transform.localPosition);
+                    mercenaryController.ReceiveExplosion(explosion.transform.localPosition);
                 }
             }
         }
