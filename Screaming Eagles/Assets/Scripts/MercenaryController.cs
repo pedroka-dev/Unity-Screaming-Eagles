@@ -17,6 +17,7 @@ namespace Assets.Scripts
 
         [SerializeField] private MercenaryClass MercenaryClass;
         [SerializeField] private MercenaryTeam MercenaryTeam;
+        [SerializeField] private bool isDummy = false;
         [SerializeField] private List<AudioClip> receiveDamageAudios;
         [SerializeField] private List<AudioClip> mercenaryDeathAudios;
 
@@ -105,7 +106,7 @@ namespace Assets.Scripts
 
 
         /// <summary>
-        ///  Sets the Max Health, Max Overheal, Max Movement Speed and other unique class stats.
+        /// Sets the Max Health, Max Overheal, Max Movement Speed and other unique class stats.
         /// </summary>
         /// <param name="mercenaryClass"></param>
         /// <exception cref="NotImplementedException"></exception>
