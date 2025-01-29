@@ -85,15 +85,17 @@ namespace Assets.Scripts
 
         private void Kill()
         {
+            audioSource.PlayOneShotRandom(mercenaryDeathAudios, 0.3f);
             CurrentHealth = 0;
             IsAlive = false;
             //TODO: block new inputs
             //TODO: ragdoll character for mercenaries
-            audioSource.PlayOneShotRandom(mercenaryDeathAudios, 0.3f);
+            //rb.freezeRotation = false;    //if you want the mercenary to fall over
             if (isDummy)
             {
                 StartCoroutine(gameObject.DestroyAfterAudioClipEnds(audioSource));
             }
+            gameObject.layer = LayerMask.NameToLayer("Neutral");
         }
 
 

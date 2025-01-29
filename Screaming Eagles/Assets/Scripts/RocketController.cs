@@ -63,7 +63,7 @@ public class RocketController : MonoBehaviour
         }
     }
 
-    private void SplashDamageMercenaries(GameObject explosion)
+    private void SplashDamageMercenaries(GameObject explosion)  //todo: make compatible with enemy explosions
     {
         ContactFilter2D contactFilter = new()
         {
