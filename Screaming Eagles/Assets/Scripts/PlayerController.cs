@@ -354,22 +354,27 @@ public class PlayerController : MonoBehaviour
     {
         foreach (Collider2D enemy in enemiesHit)
         {
-            int hitDamage = meleeDamage;
-            audioSource.PlayOneShot(hitSoundAudio, 0.25f);    //this shit is too loud
-            if (canMarketGardenCrit)
+            var enemyController = enemy.gameObject.GetComponent<MercenaryController>();
+            if (enemyController.IsAlive)
             {
-                hitDamage *= 3;
-                canMarketGardenCrit = false;    //consumes the crit. for balancing reasons, only 1 market gardener crit is allowed per rocket jump
-                Instantiate(spawnedCritPopup, enemy.transform.position, new Quaternion());
-                audioSource.PlayOneShotRandom(hitCritAudios);
+                int hitDamage = meleeDamage;
+                audioSource.PlayOneShot(hitSoundAudio, 0.25f);    //this shit is too loud
+                if (canMarketGardenCrit)
+                {
+                    hitDamage *= 3;
+                    canMarketGardenCrit = false;    //consumes the crit. for balancing reasons, only 1 market gardener crit is allowed per rocket jump
+                    Instantiate(spawnedCritPopup, enemy.transform.position, new Quaternion());
+                    audioSource.PlayOneShotRandom(hitCritAudios);
+                }
+
+                float randomPositionOffset = Random.Range(-1f, 1f);  //Damage popup just looks better with a bit of offset. Feels more dynamic and keeps visually separated from the crit popup 
+                Vector2 enemyPositionWithOffset = new(enemy.transform.position.x + randomPositionOffset, enemy.transform.position.y + randomPositionOffset / 2);
+
+                GameObject damagePopUp = Instantiate(spawnedDamagePopup, enemyPositionWithOffset, new Quaternion());
+                damagePopUp.GetComponent<DamagePopUpController>().SetText(hitDamage);
+
+                enemyController.ReceiveDamage(hitDamage);
             }
-
-            float randomPositionOffset = Random.Range(-1f, 1f);  //Damage popup just looks better with a bit of offset. Feels more dynamic and keeps visually separated from the crit popup 
-            Vector2 enemyPositionWithOffset = new(enemy.transform.position.x + randomPositionOffset, enemy.transform.position.y + randomPositionOffset / 2);
-
-            GameObject damagePopUp = Instantiate(spawnedDamagePopup, enemyPositionWithOffset, new Quaternion());
-            damagePopUp.GetComponent<DamagePopUpController>().SetText(hitDamage);
-            //enemy.ReceiveDamage(hitDamage);
         }
     }
 

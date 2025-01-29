@@ -8,7 +8,7 @@ namespace Assets.Scripts
     public class MercenaryController : MonoBehaviour
     {
         private Rigidbody2D rb;
-        //private AudioSource audioSource;
+        private AudioSource audioSource;
 
         public const float DEFAULT_MOVEMENT_SPEED = 15f;
         public const float DEFAULT_JUMPING_POWER = 26;
@@ -39,6 +39,7 @@ namespace Assets.Scripts
         private void Awake()
         {
             rb = GetComponent<Rigidbody2D>();
+            audioSource = GetComponent<AudioSource>();
         }
 
         private void Start()
@@ -69,27 +70,31 @@ namespace Assets.Scripts
         //    //TODO: heal particle
         //}
 
-        //public void ReceiveDamage(int damageValue)
-        //{
-        //    CurrentHealth -= damageValue;
-        //    if (CurrentHealth < 0)
-        //    {
-        //        Die();
-        //    }
-        //    else
-        //    {
-        //        audioSource.PlayOneShotRandom(receiveDamageAudios);
-        //    }
-        //}
+        public void ReceiveDamage(int damageValue)
+        {
+            CurrentHealth -= damageValue;
+            if (CurrentHealth < 0)
+            {
+                Kill();
+            }
+            else
+            {
+                audioSource.PlayOneShotRandom(receiveDamageAudios);
+            }
+        }
 
-        //private void Die()
-        //{
-        //    CurrentHealth = 0;
-        //    IsAlive = false;
-        //    //TODO: block new inputs
-        //    //TODO: ragdoll character
-        //    audioSource.PlayOneShotRandom(mercenaryDeathAudios);
-        //}
+        private void Kill()
+        {
+            CurrentHealth = 0;
+            IsAlive = false;
+            //TODO: block new inputs
+            //TODO: ragdoll character for mercenaries
+            audioSource.PlayOneShotRandom(mercenaryDeathAudios, 0.3f);
+            if (isDummy)
+            {
+                StartCoroutine(gameObject.DestroyAfterAudioClipEnds(audioSource));
+            }
+        }
 
 
         /// <summary>

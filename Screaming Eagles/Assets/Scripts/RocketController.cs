@@ -58,8 +58,7 @@ public class RocketController : MonoBehaviour
             GameObject explosionObject = Instantiate(spawnedExplosion, rb.position, randomZRotation);
             SplashDamageMercenaries(explosionObject);
 
-            gameObject.GetComponent<Renderer>().enabled = false;    //Hides the rocket from view without stopping the audioclip
-            StartCoroutine(DestroyAfterAudioClipEnds());
+            StartCoroutine(gameObject.DestroyAfterAudioClipEnds(audioSource));
             hasExploded = true;
         }
     }
@@ -80,7 +79,7 @@ public class RocketController : MonoBehaviour
         {
             foreach (Collider2D enemy in hitEnemies)
             {
-                if(enemy.gameObject.TryGetComponent<PlayerController>(out var mercenaryController))
+                if (enemy.gameObject.TryGetComponent<PlayerController>(out var mercenaryController))
                 {
                     mercenaryController.ReceiveExplosion(explosion.transform.localPosition);
                 }
@@ -93,22 +92,10 @@ public class RocketController : MonoBehaviour
     /// </summary>
     /// <param name="seconds"></param>
     /// <returns></returns>
-    private IEnumerator DetonateAfterFuseTimeout(float seconds)     
+    private IEnumerator DetonateAfterFuseTimeout(float seconds)
     {
         yield return new WaitForSeconds(seconds);
         Explodes();
     }
-
-    /// <summary>
-    /// Courotine for deleting the projectile once the explosion audio clip is done. Checked every frame. 
-    /// </summary>
-    /// <returns></returns>
-    private IEnumerator DestroyAfterAudioClipEnds()
-    {
-        while (audioSource.isPlaying)
-        {
-            yield return new WaitForEndOfFrame();
-        }
-        Destroy(gameObject);
-    }
 }
+    
