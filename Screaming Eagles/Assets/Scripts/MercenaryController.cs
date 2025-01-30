@@ -79,13 +79,13 @@ namespace Assets.Scripts
             }
             else
             {
-                audioSource.PlayOneShotRandom(receiveDamageAudios);
+                audioSource.PlayOneShotRandom(receiveDamageAudios, 0.8f);
             }
         }
 
         private void Kill()
         {
-            audioSource.PlayOneShotRandom(mercenaryDeathAudios, 0.3f);
+            audioSource.PlayOneShotRandom(mercenaryDeathAudios, 0.8f);
             CurrentHealth = 0;
             IsAlive = false;
             //TODO: block new inputs

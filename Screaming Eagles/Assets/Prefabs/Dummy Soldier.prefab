@@ -198,11 +198,16 @@ MonoBehaviour:
   MercenaryTeam: 0
   isDummy: 1
   receiveDamageAudios:
-  - {fileID: 8300000, guid: 053c6fbe5f8e4914383061864d7eb883, type: 3}
-  - {fileID: 8300000, guid: 6f806ee1728082548a2cf4189ed43a0c, type: 3}
-  - {fileID: 8300000, guid: 89121339ffe028347bef25a67e31e93b, type: 3}
+  - {fileID: 8300000, guid: 418bda2f07d8ded4fae585cc29376208, type: 3}
+  - {fileID: 8300000, guid: b414a50167eb0d64799af4886e19fa78, type: 3}
+  - {fileID: 8300000, guid: ec7da30aeb2a53d4d9076b26c61bd3ac, type: 3}
+  - {fileID: 8300000, guid: 3782eaf68a121a34dbe1556367f8ef52, type: 3}
+  - {fileID: 8300000, guid: 8e854ab05ec19db42a6d3ce43d44462f, type: 3}
   mercenaryDeathAudios:
-  - {fileID: 8300000, guid: 53617afd4a194ef46ae2194f9ca30727, type: 3}
+  - {fileID: 8300000, guid: 9794e78f9ead15742bf7610f7120bf8b, type: 3}
+  - {fileID: 8300000, guid: 5aa222fa732715b499d7c576759e0f80, type: 3}
+  - {fileID: 8300000, guid: 2ac3213a03d6a7243b74e1b37bf2fe2b, type: 3}
+  - {fileID: 8300000, guid: 5670ea42e00cac74eb207653e342c43a, type: 3}
 --- !u!82 &4648324699784911785
 AudioSource:
   m_ObjectHideFlags: 0
