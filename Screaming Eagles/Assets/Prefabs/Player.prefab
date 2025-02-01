@@ -384,8 +384,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MercenaryClass: 1
   MercenaryTeam: 1
+  isDummy: 0
   receiveDamageAudios: []
   mercenaryDeathAudios: []
+  spawnedDeathDustcloud: {fileID: 4014121003420161364, guid: c9ae0fc0308716049b4b6187fb3a5903, type: 3}
 --- !u!114 &521430231067724109
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -21,6 +21,7 @@ namespace Assets.Scripts
         [SerializeField] private bool isDummy = false;
         [SerializeField] private List<AudioClip> receiveDamageAudios;
         [SerializeField] private List<AudioClip> mercenaryDeathAudios;
+        [SerializeField] private GameObject spawnedDeathDustcloud;
         
 
         public int MaxHealth { get; private set; }
@@ -82,29 +83,34 @@ namespace Assets.Scripts
             }
             else
             {
-                bloodParticleSystem.Play();
+                if (bloodParticleSystem != null)    //todo: PARTICLE SYSTEM IS DESTROYING ITSELF. FIX
+                {
+                    bloodParticleSystem.Play();
+                }
                 audioSource.PlayOneShotRandom(receiveDamageAudios, 0.8f);
             }
         }
 
         private void Kill()
         {
-            audioSource.PlayOneShotRandom(mercenaryDeathAudios, 0.8f);
             CurrentHealth = 0;
-            IsAlive = false;
-            //TODO: block new inputs
-            //TODO: ragdoll character for mercenaries
-            //rb.freezeRotation = false;    //if you want the mercenary to fall over
+            IsAlive = false;    //TODO: block new inputs
+
+            Quaternion randomZRotation = Quaternion.Euler(0, 0, UnityEngine.Random.Range(0f, 360f));
+            Instantiate(spawnedDeathDustcloud, rb.transform.position, randomZRotation);
+            audioSource.PlayOneShotRandom(mercenaryDeathAudios, 0.8f);
             if (isDummy)
             {
                 StartCoroutine(gameObject.DestroyAfterAudioClipEnds(audioSource));
             }
 
-            bloodParticleSystem.transform.SetParent(null);
-            bloodParticleSystem.emission.SetBursts(new[] {new ParticleSystem.Burst(0, 15, 1, 0.001f)});
-            bloodParticleSystem.Play();
-
-            gameObject.layer = LayerMask.NameToLayer("Neutral");
+            if (bloodParticleSystem != null)    //todo: PARTICLE SYSTEM IS DESTROYING ITSELF. FIX
+            {
+                bloodParticleSystem.transform.SetParent(null);      //Avoids the object being deleted together with the object. 
+                bloodParticleSystem.emission.SetBursts(new[] { new ParticleSystem.Burst(0, 15, 1, 0.001f) });
+                bloodParticleSystem.Play();
+            }
+             gameObject.layer = LayerMask.NameToLayer("Neutral");
         }
 
 

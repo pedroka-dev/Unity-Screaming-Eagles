@@ -5043,6 +5043,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 5aa222fa732715b499d7c576759e0f80, type: 3}
   - {fileID: 8300000, guid: 2ac3213a03d6a7243b74e1b37bf2fe2b, type: 3}
   - {fileID: 8300000, guid: 5670ea42e00cac74eb207653e342c43a, type: 3}
+  spawnedDeathDustcloud: {fileID: 4014121003420161364, guid: c9ae0fc0308716049b4b6187fb3a5903, type: 3}
 --- !u!82 &4648324699784911785
 AudioSource:
   m_ObjectHideFlags: 0
