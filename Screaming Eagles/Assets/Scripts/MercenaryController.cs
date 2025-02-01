@@ -9,6 +9,7 @@ namespace Assets.Scripts
     {
         private Rigidbody2D rb;
         private AudioSource audioSource;
+        private ParticleSystem bloodParticleSystem;
 
         public const float DEFAULT_MOVEMENT_SPEED = 15f;
         public const float DEFAULT_JUMPING_POWER = 26;
@@ -20,6 +21,7 @@ namespace Assets.Scripts
         [SerializeField] private bool isDummy = false;
         [SerializeField] private List<AudioClip> receiveDamageAudios;
         [SerializeField] private List<AudioClip> mercenaryDeathAudios;
+        
 
         public int MaxHealth { get; private set; }
         public int MaxOverheal { get; private set; }
@@ -39,6 +41,7 @@ namespace Assets.Scripts
         private void Awake()
         {
             rb = GetComponent<Rigidbody2D>();
+            bloodParticleSystem = GetComponentInChildren<ParticleSystem>();
             audioSource = GetComponent<AudioSource>();
         }
 
@@ -79,6 +82,7 @@ namespace Assets.Scripts
             }
             else
             {
+                bloodParticleSystem.Play();
                 audioSource.PlayOneShotRandom(receiveDamageAudios, 0.8f);
             }
         }
@@ -95,6 +99,11 @@ namespace Assets.Scripts
             {
                 StartCoroutine(gameObject.DestroyAfterAudioClipEnds(audioSource));
             }
+
+            bloodParticleSystem.transform.SetParent(null);
+            bloodParticleSystem.emission.SetBursts(new[] {new ParticleSystem.Burst(0, 15, 1, 0.001f)});
+            bloodParticleSystem.Play();
+
             gameObject.layer = LayerMask.NameToLayer("Neutral");
         }
 

@@ -52,7 +52,7 @@ public class RocketController : MonoBehaviour
     {
         if (!hasExploded)
         {
-            audioSource.PlayOneShot(explosionSound);
+            audioSource.PlayOneShot(explosionSound, 0.8f);
             rocketSmokeTrail.Stop();
             Quaternion randomZRotation = Quaternion.Euler(0, 0, Random.Range(0f, 360f));
             GameObject explosionObject = Instantiate(spawnedExplosion, rb.position, randomZRotation);

@@ -295,7 +295,7 @@ public class PlayerController : MonoBehaviour
             {
                 //animator.SetTrigget("ShootRocket");
                 isReloading = false;
-                audioSource.PlayOneShot(shootingRocketAudio);
+                audioSource.PlayOneShot(shootingRocketAudio,0.8f);
                 Instantiate(spawnedRocket, rb.position, Quaternion.Euler(0, 0, aimAngle));
                 currentPrimaryClipContent--;
                 StartCoroutine(PrimaryFireCooldown());
