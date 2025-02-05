@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
 {
     Rigidbody2D rb;
     AudioSource audioSource;
+    ParticleSystem smokeParticleSystem;
 
     [SerializeField] private MercenaryController mercenary;
 
@@ -86,6 +87,7 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         audioSource = GetComponent<AudioSource>();
+        smokeParticleSystem = GetComponent<ParticleSystem>();
     }
 
     private void Start()
@@ -158,6 +160,7 @@ public class PlayerController : MonoBehaviour
             if (rocketJumpBufferCounter <= 0f)
             {
                 canMarketGardenCrit = false;
+                smokeParticleSystem.Stop();
             }
         }
         else
@@ -295,7 +298,7 @@ public class PlayerController : MonoBehaviour
             {
                 //animator.SetTrigget("ShootRocket");
                 isReloading = false;
-                audioSource.PlayOneShot(shootingRocketAudio,0.8f);
+                audioSource.PlayOneShot(shootingRocketAudio,0.7f);
                 Instantiate(spawnedRocket, rb.position, Quaternion.Euler(0, 0, aimAngle));
                 currentPrimaryClipContent--;
                 StartCoroutine(PrimaryFireCooldown());
@@ -319,11 +322,11 @@ public class PlayerController : MonoBehaviour
             //animator.SetTrigget("MeleeSwing");
             if (canMarketGardenCrit)
             {
-                audioSource.PlayOneShot(shovelAttackCritAudio);
+                audioSource.PlayOneShot(shovelAttackCritAudio,0.8f);
             }
             else
             {
-                audioSource.PlayOneShot(shovelAttackAudio);
+                audioSource.PlayOneShot(shovelAttackAudio,0.8f);
             }
 
             Vector2 spawnDirection = new(Mathf.Cos(aimAngle * Mathf.Deg2Rad), Mathf.Sin(aimAngle * Mathf.Deg2Rad));
@@ -364,7 +367,7 @@ public class PlayerController : MonoBehaviour
                     hitDamage *= 3;
                     canMarketGardenCrit = false;    //consumes the crit. for balancing reasons, only 1 market gardener crit is allowed per rocket jump
                     Instantiate(spawnedCritPopup, enemy.transform.position, new Quaternion());
-                    audioSource.PlayOneShotRandom(hitCritAudios);
+                    audioSource.PlayOneShotRandom(hitCritAudios,0.8f);
                 }
 
                 float randomPositionOffset = Random.Range(-1f, 1f);  //Damage popup just looks better with a bit of offset. Feels more dynamic and keeps visually separated from the crit popup 
@@ -407,6 +410,7 @@ public class PlayerController : MonoBehaviour
 
         rb.AddForce(knockbackForce, ForceMode2D.Impulse);
         canMarketGardenCrit = true;
+        smokeParticleSystem.Play();
         rocketJumpBufferCounter = marketGardenBufferTime;
     }
 }

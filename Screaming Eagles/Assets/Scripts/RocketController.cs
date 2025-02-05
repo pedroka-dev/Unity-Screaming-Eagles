@@ -5,7 +5,8 @@ using UnityEngine;
 public class RocketController : MonoBehaviour
 {
     private Rigidbody2D rb;
-    private AudioSource audioSource;
+    private ParticleSystem rocketSmokeTrail;
+    private SpriteRenderer spriteRenderer;
 
     [SerializeField] private float projectileSpeed = 30f;
     [SerializeField] private float autoDetonationFuseTimeout = 10f;
@@ -13,14 +14,14 @@ public class RocketController : MonoBehaviour
     [SerializeField] private GameObject spawnedExplosion;
     [SerializeField] private AudioClip explosionSound;
     [SerializeField] private LayerMask collisionLayerMask;
-    [SerializeField] private ParticleSystem rocketSmokeTrail;
 
     private bool hasExploded = false;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        audioSource = GetComponent<AudioSource>();
+        rocketSmokeTrail = GetComponent<ParticleSystem>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     private void Start()
@@ -50,20 +51,16 @@ public class RocketController : MonoBehaviour
 
     private void Explodes()
     {
-        if (!hasExploded)
-        {
-            audioSource.PlayOneShot(explosionSound, 0.8f);
-            rocketSmokeTrail.Stop();
-            Quaternion randomZRotation = Quaternion.Euler(0, 0, Random.Range(0f, 360f));
-            GameObject explosionObject = Instantiate(spawnedExplosion, rb.position, randomZRotation);
-            SplashDamageMercenaries(explosionObject);
-
-            StartCoroutine(gameObject.DestroyAfterAudioClipEnds(audioSource));
-            hasExploded = true;
-        }
+        rocketSmokeTrail.Stop();
+        rb.simulated = false;
+        spriteRenderer.enabled = false;
+        Quaternion randomZRotation = Quaternion.Euler(0, 0, Random.Range(0f, 360f));
+        GameObject explosionObject = Instantiate(spawnedExplosion, rb.position, randomZRotation, null);
+        SplashDamageMercenaries(explosionObject);
+        Destroy(this);
     }
 
-    private void SplashDamageMercenaries(GameObject explosion)  //todo: make compatible with enemy explosions
+    private void SplashDamageMercenaries(GameObject explosion)  //todo: make compatible with enemy explosions; take responsability out of here
     {
         ContactFilter2D contactFilter = new()
         {
