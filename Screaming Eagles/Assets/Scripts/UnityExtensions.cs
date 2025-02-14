@@ -33,10 +33,10 @@ public static class UnityExtensions
     /// Courotine for hiding and deleting the an object once a expecific audio source stopped playing. Checked every frame. 
     /// </summary>
     /// <returns></returns>
-    public static IEnumerator DestroyAfterAudioClipEnds(this GameObject gameObject, AudioSource audioSource)
+    public static IEnumerator DestroyAfterAudioAndPaticlesEnd(this GameObject gameObject, AudioSource audioSource, ParticleSystem particleSystem)
     {
         gameObject.GetComponent<Renderer>().enabled = false;    //Hides the object from view without stopping the audioclip
-        while (audioSource.isPlaying)
+        while (audioSource.isPlaying || particleSystem.isPlaying)
         {
             yield return new WaitForEndOfFrame();
         }

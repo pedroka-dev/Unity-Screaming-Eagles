@@ -3732,6 +3732,22 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3776549124678907984, guid: a1cc9e36e62ba0f4bbee510dbf3553dc, type: 3}
+      propertyPath: ShapeModule.m_Scale.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3776549124678907984, guid: a1cc9e36e62ba0f4bbee510dbf3553dc, type: 3}
+      propertyPath: ShapeModule.m_Scale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3776549124678907984, guid: a1cc9e36e62ba0f4bbee510dbf3553dc, type: 3}
+      propertyPath: ShapeModule.m_Position.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3776549124678907984, guid: a1cc9e36e62ba0f4bbee510dbf3553dc, type: 3}
+      propertyPath: ShapeModule.randomPositionAmount
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3776549124678907984, guid: a1cc9e36e62ba0f4bbee510dbf3553dc, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
       value: 5
       objectReference: {fileID: 0}

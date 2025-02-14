@@ -12,10 +12,7 @@ public class RocketController : MonoBehaviour
     [SerializeField] private float autoDetonationFuseTimeout = 10f;
     [SerializeField] private float damage = 0f;
     [SerializeField] private GameObject spawnedExplosion;
-    [SerializeField] private AudioClip explosionSound;
     [SerializeField] private LayerMask collisionLayerMask;
-
-    private bool hasExploded = false;
 
     private void Awake()
     {

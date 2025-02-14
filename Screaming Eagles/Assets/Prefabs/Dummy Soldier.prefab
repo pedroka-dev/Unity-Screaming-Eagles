@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7426619059706871155}
   - component: {fileID: 6767220638425576537}
   m_Layer: 5
-  m_Name: Wood Particle System
+  m_Name: Wood Pieces Particle System
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -43,7 +43,7 @@ ParticleSystem:
   serializedVersion: 8
   lengthInSec: 0.1
   simulationSpeed: 1
-  stopAction: 2
+  stopAction: 0
   cullingMode: 0
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}

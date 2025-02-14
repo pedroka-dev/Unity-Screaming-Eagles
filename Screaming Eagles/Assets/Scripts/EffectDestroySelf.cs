@@ -15,10 +15,10 @@ public class EffectDestroySelf : MonoBehaviour
 
     void Update()
     {
-        if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1 && !animator.IsInTransition(0))     //Makes an effect destroy itself after the animation ends
+        if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1 && !animator.IsInTransition(0))     //Makes an effect stop rendering after the animation ends
         {
             spriteRenderer.enabled = false;
-            if(audioSource == null || !audioSource.isPlaying)
+            if (audioSource == null || !audioSource.isPlaying) //todo: also verify if particle system ended
                 Destroy(gameObject);
         }
     }

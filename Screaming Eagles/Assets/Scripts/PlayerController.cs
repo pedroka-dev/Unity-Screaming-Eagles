@@ -298,7 +298,7 @@ public class PlayerController : MonoBehaviour
             {
                 //animator.SetTrigget("ShootRocket");
                 isReloading = false;
-                audioSource.PlayOneShot(shootingRocketAudio,0.7f);
+                audioSource.PlayOneShot(shootingRocketAudio,0.5f);
                 Instantiate(spawnedRocket, rb.position, Quaternion.Euler(0, 0, aimAngle));
                 currentPrimaryClipContent--;
                 StartCoroutine(PrimaryFireCooldown());
@@ -308,8 +308,8 @@ public class PlayerController : MonoBehaviour
             {
                 if (!isReloading)
                 {
-                    audioSource.PlayOneShot(clipEmptyAudio);
                     StartCoroutine(PrimaryReload());
+                    audioSource.PlayOneShot(clipEmptyAudio);
                 }
             }
         }
@@ -361,7 +361,7 @@ public class PlayerController : MonoBehaviour
             if (enemyController.IsAlive)
             {
                 int hitDamage = meleeDamage;
-                audioSource.PlayOneShot(hitSoundAudio, 0.25f);    //this shit is too loud
+                audioSource.PlayOneShot(hitSoundAudio, 0.15f);    //this shit is too loud
                 if (canMarketGardenCrit)
                 {
                     hitDamage *= 3;

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Assets.Scripts
 {
@@ -10,6 +11,7 @@ namespace Assets.Scripts
         private Rigidbody2D rb;
         private AudioSource audioSource;
         private ParticleSystem bloodParticleSystem;
+        private SpriteRenderer spriteRenderer;
 
         public const float DEFAULT_MOVEMENT_SPEED = 15f;
         public const float DEFAULT_JUMPING_POWER = 26;
@@ -44,6 +46,7 @@ namespace Assets.Scripts
             rb = GetComponent<Rigidbody2D>();
             bloodParticleSystem = GetComponentInChildren<ParticleSystem>();
             audioSource = GetComponent<AudioSource>();
+            spriteRenderer = GetComponent<SpriteRenderer>();
         }
 
         private void Start()
@@ -83,10 +86,9 @@ namespace Assets.Scripts
             }
             else
             {
-                if (bloodParticleSystem != null)    //todo: PARTICLE SYSTEM IS DESTROYING ITSELF. FIX
-                {
+                if (damageValue > 0)
                     bloodParticleSystem.Play();
-                }
+
                 audioSource.PlayOneShotRandom(receiveDamageAudios, 0.8f);
             }
         }
@@ -98,19 +100,21 @@ namespace Assets.Scripts
 
             Quaternion randomZRotation = Quaternion.Euler(0, 0, UnityEngine.Random.Range(0f, 360f));
             Instantiate(spawnedDeathDustcloud, rb.transform.position, randomZRotation);
+           
             audioSource.PlayOneShotRandom(mercenaryDeathAudios, 0.8f);
-            if (isDummy)
+
+            bloodParticleSystem.emission.SetBursts(new[] { new ParticleSystem.Burst(0, 15, 1, 0.001f) });  //Basically, a big burst. TODO: fix values for player
+            bloodParticleSystem.Play();
+
+            if (isDummy)    //TODO: Modify to player as well 
             {
-                StartCoroutine(gameObject.DestroyAfterAudioClipEnds(audioSource));
+                rb.simulated = false;
+                spriteRenderer.enabled = false;
+                StartCoroutine(gameObject.DestroyAfterAudioAndPaticlesEnd(audioSource, bloodParticleSystem));
             }
 
-            if (bloodParticleSystem != null)    //todo: PARTICLE SYSTEM IS DESTROYING ITSELF. FIX
-            {
-                bloodParticleSystem.transform.SetParent(null);      //Avoids the object being deleted together with the object. 
-                bloodParticleSystem.emission.SetBursts(new[] { new ParticleSystem.Burst(0, 15, 1, 0.001f) });
-                bloodParticleSystem.Play();
-            }
-             gameObject.layer = LayerMask.NameToLayer("Neutral");
+
+            gameObject.layer = LayerMask.NameToLayer("Neutral");
         }
 
 
