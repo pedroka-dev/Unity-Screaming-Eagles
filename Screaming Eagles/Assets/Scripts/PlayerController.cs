@@ -49,6 +49,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private AudioClip drawMelee;
     [SerializeField] private List<SpriteRenderer> soldierPrimarySprite;
     [SerializeField] private List<SpriteRenderer> soldierMeleeSprite;
+
     
     private Vector2 mousePosition;
     private float aimAngle = 360f;  //scale of 0 to 360 always, counter clockwise
@@ -70,6 +71,7 @@ public class PlayerController : MonoBehaviour
 
     private bool canShootPrimary = true;
     private bool isReloading = false;
+    private Coroutine reloadCoroutine;
 
     [Header("Melee Weapon")]
     [SerializeField] private float meleeRange = 2f;
@@ -260,10 +262,7 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.R) && CurrentSelectedWeapon == SelectedWeapon.Primary)
         {
-            if (!isReloading)
-            {
-                StartCoroutine(PrimaryReload());
-            }
+            reloadCoroutine ??= StartCoroutine(PrimaryReload());
         }
     }
 
@@ -300,6 +299,7 @@ public class PlayerController : MonoBehaviour
                 isReloading = false;
             }
         }
+        reloadCoroutine = null;     // Reset the coroutine reference when done
     }
 
     private void HandlePlayerWeapon()
@@ -335,7 +335,7 @@ public class PlayerController : MonoBehaviour
             {
                 if (!isReloading)
                 {
-                    StartCoroutine(PrimaryReload());
+                    reloadCoroutine ??= StartCoroutine(PrimaryReload());
                     Instantiate(spawnedClipEmptyPopup, rb.position, new Quaternion());
                     audioSource.PlayOneShot(clipEmptyAudio);
                 }
