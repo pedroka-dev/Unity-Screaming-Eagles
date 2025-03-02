@@ -43,6 +43,7 @@ public class PlayerController : MonoBehaviour
     public SelectedWeapon CurrentSelectedWeapon = SelectedWeapon.Primary;
     [SerializeField] private GameObject spawnedDamagePopup;
     [SerializeField] private GameObject spawnedCritPopup;
+    [SerializeField] private GameObject spawnedClipEmptyPopup;
     [SerializeField] private Camera PlayerCamera;
     [SerializeField] private AudioClip drawPrimary;
     [SerializeField] private AudioClip drawMelee;
@@ -185,7 +186,7 @@ public class PlayerController : MonoBehaviour
 
             if (IsBunnyhopping())
             {
-                audioSource.PlayOneShot(BhopJumpAudio, 0.10f);
+                audioSource.PlayOneShot(BhopJumpAudio, 0.05f);
                 Instantiate(spawnedBhopPopup, rb.position, new Quaternion());
             }       
         }
@@ -214,7 +215,7 @@ public class PlayerController : MonoBehaviour
     /// Check if the current jump is a market gardener bunny hop instead of normal jump.
     /// </summary>
     /// <returns></returns>
-    private bool IsBunnyhopping() => canMarketGardenCrit && IsGrounded()
+    private bool IsBunnyhopping() => canMarketGardenCrit //&& IsGrounded()
         && rb.velocity.y >= MercenaryController.DEFAULT_JUMPING_POWER / 3    //verifies if the jump is not too shallow
         && rocketJumpBufferCounter != DEFAULT_MARKET_GARDEN_BUFFFER_TIME;   //verifies if the bhop attempt is not on the first frame (for example, on the first rocket jump)
 
@@ -335,6 +336,7 @@ public class PlayerController : MonoBehaviour
                 if (!isReloading)
                 {
                     StartCoroutine(PrimaryReload());
+                    Instantiate(spawnedClipEmptyPopup, rb.position, new Quaternion());
                     audioSource.PlayOneShot(clipEmptyAudio);
                 }
             }

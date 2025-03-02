@@ -11,10 +11,10 @@ GameObject:
   - component: {fileID: 443165351539448821}
   - component: {fileID: 243923202954842497}
   - component: {fileID: 7858456136158543071}
-  - component: {fileID: -2314999079745826556}
+  - component: {fileID: 8829159011108173387}
   - component: {fileID: -6013177994663304267}
   m_Layer: 5
-  m_Name: Bhop Popup
+  m_Name: Clip Empty Popup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -36,8 +36,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.2, y: 0.08}
-  m_SizeDelta: {x: 20, y: 7}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 20, y: 4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &243923202954842497
 MeshRenderer:
@@ -77,8 +77,8 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -889920933
-  m_SortingLayer: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &7858456136158543071
@@ -101,7 +101,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: B-Hop!
+  m_text: '*clip empty*'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 98c4c912cb36428449782bf4f10729cc, type: 2}
   m_sharedMaterial: {fileID: 2211732908738354752, guid: 98c4c912cb36428449782bf4f10729cc, type: 2}
@@ -110,8 +110,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4290576639
-  m_fontColor: {r: 1, g: 0, b: 0.9890208, a: 1}
+    rgba: 4278216959
+  m_fontColor: {r: 1, g: 0.40928373, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -128,15 +128,15 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 10
-  m_fontSizeBase: 10
+  m_fontSize: 8
+  m_fontSizeBase: 8
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 1
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 512
+  m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -173,7 +173,7 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 243923202954842497}
   m_maskType: 0
---- !u!114 &-2314999079745826556
+--- !u!114 &8829159011108173387
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -182,12 +182,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 986486104005465942}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6003ac49aaa475d45ba4d9d4023ba9f6, type: 3}
+  m_Script: {fileID: 11500000, guid: a29c7ccb10cdc7448a3d71bac51a0852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  textRollSpeed: 5
-  fadeAwayTimer: 0.3
-  fadeAwaySpeed: 2
+  textRollSpeed: 1
+  fadeAwayTimer: 0.5
+  fadeAwaySpeed: 3
 --- !u!50 &-6013177994663304267
 Rigidbody2D:
   serializedVersion: 4
