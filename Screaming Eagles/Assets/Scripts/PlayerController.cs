@@ -22,18 +22,20 @@ public class PlayerController : MonoBehaviour
 
     [Header("Movement & Jumping")]
     private float horizontalInput;
-    [SerializeField] private Transform groundCheck;
+    [SerializeField] private Transform groundCheckTransform;
     [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private AudioClip BhopJumpAudio;
+    [SerializeField] private GameObject spawnedBhopPopup;
 
     private bool canMarketGardenCrit;
 
-    private readonly float marketGardenBufferTime = 0.05f;  // Market Garden buffer makes market gardening input more forgiving and allows bhoping crits
+    private const float DEFAULT_MARKET_GARDEN_BUFFFER_TIME = 0.05f;  // Market Garden buffer makes market gardening input more forgiving and allows bhoping crits
     private float rocketJumpBufferCounter;
 
-    private readonly float coyoteTime = 0.2f;    // Coyote time allows player to jump a brief moment after being in the air
+    private const float DEFAULT_COYOTE_TIME = 0.2f;    // Coyote time allows player to jump a brief moment after being in the air
     private float coyoteTimeCounter;
 
-    private readonly float jumpBufferTime = 0.2f;     // Jump buffer allows player to jump for a brief moment before touching the ground
+    private const float DEFAULT_JUMP_BUFFER_TIME = 0.2f;     // Jump buffer allows player to jump for a brief moment before touching the ground
     private float jumpBufferCounter;
 
 
@@ -79,8 +81,6 @@ public class PlayerController : MonoBehaviour
     private bool canShootMelee = true;
     private float meleeFireRate = 0.8f;
     private int meleeDamage = 65;
-
-    private bool IsGrounded() => Physics2D.OverlapCircle(groundCheck.position, 0.25f, groundLayer);
     
 
     private void Awake()
@@ -154,7 +154,7 @@ public class PlayerController : MonoBehaviour
     {
         if (IsGrounded())
         {
-            coyoteTimeCounter = coyoteTime;
+            coyoteTimeCounter = DEFAULT_COYOTE_TIME;
 
             rocketJumpBufferCounter -= Time.deltaTime;
             if (rocketJumpBufferCounter <= 0f)
@@ -166,23 +166,28 @@ public class PlayerController : MonoBehaviour
         else
         {
             coyoteTimeCounter -= Time.deltaTime;
-            rocketJumpBufferCounter = marketGardenBufferTime;
-        }   
+            rocketJumpBufferCounter = DEFAULT_MARKET_GARDEN_BUFFFER_TIME;
+        }
 
         if (Input.GetButtonDown("Jump"))
         {
-            jumpBufferCounter = jumpBufferTime;
+            jumpBufferCounter = DEFAULT_JUMP_BUFFER_TIME;
         }
         else
         {
             jumpBufferCounter -= Time.deltaTime;
         }
 
-        // Check if the player can jump (considering coyote time and jump buffer)
-        if (coyoteTimeCounter > 0f && jumpBufferCounter > 0f && !mercenary.IsJumping)
+        if (CanJump())
         {
             mercenary.Jump();
             jumpBufferCounter = 0f;
+
+            if (IsBunnyhopping())
+            {
+                audioSource.PlayOneShot(BhopJumpAudio, 0.10f);
+                Instantiate(spawnedBhopPopup, rb.position, new Quaternion());
+            }       
         }
 
         // Allow for a "variable jump height" by reducing upward velocity when the player releases the jump button
@@ -192,7 +197,28 @@ public class PlayerController : MonoBehaviour
             coyoteTimeCounter = 0f;
         }
     }
-   
+
+    /// <summary>
+    /// Uses the ground check object on the prefab to verify if the mercenary is contact with the ground bellow
+    /// </summary>
+    /// <returns></returns>
+    private bool IsGrounded() => Physics2D.OverlapCircle(groundCheckTransform.position, 0.25f, groundLayer);
+
+    /// <summary>
+    /// Check if the player can jump (considering coyote time, jump buffer and if its not already jumping)
+    /// </summary>
+    /// <returns></returns>
+    private bool CanJump() => coyoteTimeCounter > 0f && jumpBufferCounter > 0f && !mercenary.IsJumping;
+
+    /// <summary>
+    /// Check if the current jump is a market gardener bunny hop instead of normal jump.
+    /// </summary>
+    /// <returns></returns>
+    private bool IsBunnyhopping() => canMarketGardenCrit && IsGrounded()
+        && rb.velocity.y >= MercenaryController.DEFAULT_JUMPING_POWER / 3    //verifies if the jump is not too shallow
+        && rocketJumpBufferCounter != DEFAULT_MARKET_GARDEN_BUFFFER_TIME;   //verifies if the bhop attempt is not on the first frame (for example, on the first rocket jump)
+
+
     #endregion
 
 
@@ -365,7 +391,7 @@ public class PlayerController : MonoBehaviour
                 if (canMarketGardenCrit)
                 {
                     hitDamage *= 3;
-                    canMarketGardenCrit = false;    //consumes the crit. for balancing reasons, only 1 market gardener crit is allowed per rocket jump
+                    //canMarketGardenCrit = false;    //consumes the crit. for balancing reasons, only 1 market gardener crit is allowed per rocket jump
                     Instantiate(spawnedCritPopup, enemy.transform.position, new Quaternion());
                     audioSource.PlayOneShotRandom(hitCritAudios,0.8f);
                 }
@@ -411,6 +437,6 @@ public class PlayerController : MonoBehaviour
         rb.AddForce(knockbackForce, ForceMode2D.Impulse);
         canMarketGardenCrit = true;
         smokeParticleSystem.Play();
-        rocketJumpBufferCounter = marketGardenBufferTime;
+        rocketJumpBufferCounter = DEFAULT_MARKET_GARDEN_BUFFFER_TIME;
     }
 }

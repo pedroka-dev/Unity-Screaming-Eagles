@@ -3527,7 +3527,7 @@ ScriptedImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 1
     textureFormat: -1
-    textureCompression: 2
+    textureCompression: 0
     compressionQuality: 50
     forceMaximumCompressionQuality_BC6H_BC7: 0
     crunchedCompression: 0
@@ -3718,7 +3718,7 @@ ScriptedImporter:
     isGroup: 0
     importLayer: 1
   importFileNodeState: 1
-  platformSettingsDirtyTick: 638740154644289261
+  platformSettingsDirtyTick: 638756586297131028
   spriteSizeExpandChanged: 0
   generateGOHierarchy: 1
   textureAssetName: 

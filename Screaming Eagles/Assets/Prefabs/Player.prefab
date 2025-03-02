@@ -403,10 +403,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mercenary: {fileID: 2085764433064960521}
-  groundCheck: {fileID: 404821963647639446}
+  groundCheckTransform: {fileID: 404821963647639446}
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
+  BhopJumpAudio: {fileID: 8300000, guid: 8f0f847ad14936a47bc155f28606fac5, type: 3}
+  spawnedBhopPopup: {fileID: 986486104005465942, guid: a631dc756189653479d5670d0149b65b, type: 3}
   CurrentSelectedWeapon: 0
   spawnedDamagePopup: {fileID: 986486104005465942, guid: 5d8580135e442e541b96edd9adabff21, type: 3}
   spawnedCritPopup: {fileID: 986486104005465942, guid: c4844c9efdae1c2438392d86ace0dec1, type: 3}

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: -2314999079745826556}
   - component: {fileID: -6013177994663304267}
   m_Layer: 5
-  m_Name: Crit Popup
+  m_Name: Bhop Popup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -77,8 +77,8 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -889920933
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &7858456136158543071
@@ -101,9 +101,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'CRITICAL
+  m_text: 'Bunny
 
-    HIT!!!'
+    Hop!!!'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 98c4c912cb36428449782bf4f10729cc, type: 2}
   m_sharedMaterial: {fileID: 2211732908738354752, guid: 98c4c912cb36428449782bf4f10729cc, type: 2}
@@ -112,8 +112,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278255393
-  m_fontColor: {r: 0.13039613, g: 1, b: 0, a: 1}
+    rgba: 4290576639
+  m_fontColor: {r: 1, g: 0, b: 0.7415495, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -138,7 +138,7 @@ MonoBehaviour:
   m_fontSizeMax: 72
   m_fontStyle: 1
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 256
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -189,7 +189,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   textRollSpeed: 5
   fadeAwayTimer: 0.3
-  fadeAwaySpeed: 5
+  fadeAwaySpeed: 2
 --- !u!50 &-6013177994663304267
 Rigidbody2D:
   serializedVersion: 4
